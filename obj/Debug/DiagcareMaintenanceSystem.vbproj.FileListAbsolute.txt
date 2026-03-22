@@ -9,3 +9,5 @@ G:\Assignment\SecondYearSecondSem\CCS5\DiagcareMaintenanceSystem\obj\Debug\Diagc
 G:\Assignment\SecondYearSecondSem\CCS5\DiagcareMaintenanceSystem\obj\Debug\DiagcareMaintenanceSystem.exe
 G:\Assignment\SecondYearSecondSem\CCS5\DiagcareMaintenanceSystem\obj\Debug\DiagcareMaintenanceSystem.xml
 G:\Assignment\SecondYearSecondSem\CCS5\DiagcareMaintenanceSystem\obj\Debug\DiagcareMaintenanceSystem.pdb
+G:\Assignment\SecondYearSecondSem\CCS5\DiagcareMaintenanceSystem\obj\Debug\DiagcareMaintenanceSystem.exe.config
+G:\Assignment\SecondYearSecondSem\CCS5\DiagcareMaintenanceSystem\obj\Debug\DiagcareMaintenanceSystem.frmLogin.resources
