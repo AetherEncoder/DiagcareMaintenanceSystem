@@ -1,4 +1,5 @@
 ﻿Imports System.Data
+Imports System.IO
 Imports MySql.Data.MySqlClient
 
 Public Class frmDashboard
@@ -24,6 +25,24 @@ Public Class frmDashboard
 
     Private Sub frmLogin_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         MyConnectionString = "datasource=localhost;username=root;password=;database=trustmed"
+
+        Dim logoCandidates As String() = {
+            Path.Combine(Application.StartupPath, "src\TrustMed.png"),
+            Path.GetFullPath(Path.Combine(Application.StartupPath, "..\src\TrustMed.png")),
+            Path.GetFullPath(Path.Combine(Application.StartupPath, "..\..\src\TrustMed.png"))
+        }
+
+        For Each logoPath As String In logoCandidates
+            If File.Exists(logoPath) Then
+                pbTrustMedLogo.Image = Image.FromFile(logoPath)
+                Exit For
+            End If
+        Next
+
+        If pbTrustMedLogo.Image Is Nothing AndAlso Me.Icon IsNot Nothing Then
+            pbTrustMedLogo.Image = Me.Icon.ToBitmap()
+        End If
+
         ClearErrorMessages()
     End Sub
 
@@ -149,195 +168,64 @@ Public Class frmDashboard
 
     Private Sub LoadDashboardOverview()
         Try
-            Using conn As New MySqlConnection(MyConnectionString)
-                conn.Open()
+            MyConnection = New MySqlConnection(MyConnectionString)
+            MyConnection.Open()
 
-                lblTotalPatientsValue.Text = GetTableCount(conn, "patient").ToString()
-                lblConsultationsTodayValue.Text = GetTodayCount(conn, "consultation", New String() {"consultation_date", "consult_date", "date", "created_at", "date_created"}).ToString()
-                lblPendingLabOrdersValue.Text = GetPendingCount(conn, "lab_order", New String() {"status"}).ToString()
-                lblCompletedExaminationsValue.Text = GetCompletedCount(conn, "examination", New String() {"status"}).ToString()
+            userSQLQuery = "SELECT COUNT(*) FROM patient"
+            Dim cmd As New MySqlCommand(userSQLQuery, CType(MyConnection, MySqlConnection))
+            lblTotalPatientsValue.Text = Convert.ToInt32(cmd.ExecuteScalar()).ToString()
 
-                dgvRecentActivity.DataSource = GetRecentActivityTable(conn)
-                dgvTodaysWork.DataSource = GetTodaysWorkTable(conn)
-            End Using
-        Catch
-            lblTotalPatientsValue.Text = "-"
-            lblConsultationsTodayValue.Text = "-"
-            lblPendingLabOrdersValue.Text = "-"
-            lblCompletedExaminationsValue.Text = "-"
-            dgvRecentActivity.DataSource = CreateInfoTable("No recent activity available.")
-            dgvTodaysWork.DataSource = CreateInfoTable("No work items available for today.")
+            userSQLQuery = "SELECT COUNT(*) FROM lab_order"
+            cmd = New MySqlCommand(userSQLQuery, CType(MyConnection, MySqlConnection))
+            lblLabOrdersValue.Text = Convert.ToInt32(cmd.ExecuteScalar()).ToString()
+
+        Catch ex As MySqlException
+            lblTotalPatientsValue.Text = "0"
+            lblLabOrdersValue.Text = "0"
+        Catch ex As Exception
+            lblTotalPatientsValue.Text = "0"
+            lblLabOrdersValue.Text = "0"
+        Finally
+            If MyConnection IsNot Nothing AndAlso MyConnection.State = ConnectionState.Open Then
+                MyConnection.Close()
+            End If
         End Try
     End Sub
 
-    Private Function GetTableCount(conn As MySqlConnection, tableName As String) As Integer
-        If Not TableExists(conn, tableName) Then
-            Return 0
-        End If
-
-        Using cmd As New MySqlCommand($"SELECT COUNT(*) FROM {tableName}", conn)
+    Private Function ExecuteCountQuerySafe(primaryQuery As String, Optional fallbackQuery As String = "") As Integer
+        Try
+            userSQLQuery = primaryQuery
+            Dim cmd As New MySqlCommand(userSQLQuery, CType(MyConnection, MySqlConnection))
             Return Convert.ToInt32(cmd.ExecuteScalar())
-        End Using
-    End Function
+        Catch
+            If fallbackQuery <> "" Then
+                Try
+                    userSQLQuery = fallbackQuery
+                    Dim cmd As New MySqlCommand(userSQLQuery, CType(MyConnection, MySqlConnection))
+                    Return Convert.ToInt32(cmd.ExecuteScalar())
+                Catch
+                    Return 0
+                End Try
+            End If
 
-    Private Function GetTodayCount(conn As MySqlConnection, tableName As String, dateColumns As String()) As Integer
-        If Not TableExists(conn, tableName) Then
             Return 0
-        End If
-
-        Dim dateCol As String = GetFirstExistingColumn(conn, tableName, dateColumns)
-        If String.IsNullOrEmpty(dateCol) Then
-            Return 0
-        End If
-
-        Using cmd As New MySqlCommand($"SELECT COUNT(*) FROM {tableName} WHERE DATE({dateCol}) = CURDATE()", conn)
-            Return Convert.ToInt32(cmd.ExecuteScalar())
-        End Using
+        End Try
     End Function
 
-    Private Function GetPendingCount(conn As MySqlConnection, tableName As String, statusColumns As String()) As Integer
-        If Not TableExists(conn, tableName) Then
-            Return 0
-        End If
+    Private Function ExecuteTableQuerySafe(query As String, emptyMessage As String) As DataTable
+        Try
+            Dim dt As New DataTable()
+            userDA = New MySqlDataAdapter(query, CType(MyConnection, MySqlConnection))
+            userDA.Fill(dt)
 
-        Dim statusCol As String = GetFirstExistingColumn(conn, tableName, statusColumns)
-        If String.IsNullOrEmpty(statusCol) Then
-            Return GetTableCount(conn, tableName)
-        End If
+            If dt.Rows.Count = 0 Then
+                Return CreateInfoTable(emptyMessage)
+            End If
 
-        Using cmd As New MySqlCommand($"SELECT COUNT(*) FROM {tableName} WHERE LOWER(COALESCE({statusCol}, '')) = 'pending'", conn)
-            Return Convert.ToInt32(cmd.ExecuteScalar())
-        End Using
-    End Function
-
-    Private Function GetCompletedCount(conn As MySqlConnection, tableName As String, statusColumns As String()) As Integer
-        If Not TableExists(conn, tableName) Then
-            Return 0
-        End If
-
-        Dim statusCol As String = GetFirstExistingColumn(conn, tableName, statusColumns)
-        If String.IsNullOrEmpty(statusCol) Then
-            Return GetTableCount(conn, tableName)
-        End If
-
-        Using cmd As New MySqlCommand($"SELECT COUNT(*) FROM {tableName} WHERE LOWER(COALESCE({statusCol}, '')) = 'completed'", conn)
-            Return Convert.ToInt32(cmd.ExecuteScalar())
-        End Using
-    End Function
-
-    Private Function GetRecentActivityTable(conn As MySqlConnection) As DataTable
-        Dim activitySelects As New List(Of String)
-
-        Dim consultationSelect As String = BuildRecentActivitySelect(conn, "consultation", "Consultation")
-        If consultationSelect <> "" Then activitySelects.Add(consultationSelect)
-
-        Dim diagnosisSelect As String = BuildRecentActivitySelect(conn, "diagnosis", "Diagnosis")
-        If diagnosisSelect <> "" Then activitySelects.Add(diagnosisSelect)
-
-        Dim prescriptionSelect As String = BuildRecentActivitySelect(conn, "prescription", "Prescription")
-        If prescriptionSelect <> "" Then activitySelects.Add(prescriptionSelect)
-
-        If activitySelects.Count = 0 Then
-            Return CreateInfoTable("No recent activity data available.")
-        End If
-
-        Dim sql As String = "SELECT activity_type AS Activity, reference_no AS ReferenceNo, patient_no AS PatientNo, activity_date AS ActivityDate FROM (" &
-                            String.Join(" UNION ALL ", activitySelects) &
-                            ") AS activity_feed ORDER BY activity_date DESC LIMIT 20"
-
-        Dim dt As New DataTable()
-        Using da As New MySqlDataAdapter(sql, conn)
-            da.Fill(dt)
-        End Using
-
-        Return dt
-    End Function
-
-    Private Function GetTodaysWorkTable(conn As MySqlConnection) As DataTable
-        Dim workSelects As New List(Of String)
-
-        Dim consultWork As String = BuildTodaysConsultationWorkSelect(conn)
-        If consultWork <> "" Then workSelects.Add(consultWork)
-
-        Dim labWork As String = BuildTodaysLabWorkSelect(conn)
-        If labWork <> "" Then workSelects.Add(labWork)
-
-        If workSelects.Count = 0 Then
-            Return CreateInfoTable("No work data available.")
-        End If
-
-        Dim sql As String = "SELECT work_type AS WorkType, reference_no AS ReferenceNo, patient_no AS PatientNo, work_date AS WorkDate, work_status AS Status FROM (" &
-                            String.Join(" UNION ALL ", workSelects) &
-                            ") AS work_feed ORDER BY work_date DESC LIMIT 20"
-
-        Dim dt As New DataTable()
-        Using da As New MySqlDataAdapter(sql, conn)
-            da.Fill(dt)
-        End Using
-
-        Return dt
-    End Function
-
-    Private Function BuildRecentActivitySelect(conn As MySqlConnection, tableName As String, activityType As String) As String
-        If Not TableExists(conn, tableName) Then
-            Return ""
-        End If
-
-        Dim idCol As String = GetFirstExistingColumn(conn, tableName, New String() {$"{tableName}_id", "id"})
-        Dim patientCol As String = GetFirstExistingColumn(conn, tableName, New String() {"patient_id", "patient_no", "patient"})
-        Dim dateCol As String = GetFirstExistingColumn(conn, tableName, New String() {"date", "created_at", "date_created", tableName & "_date"})
-
-        If String.IsNullOrEmpty(dateCol) Then
-            Return ""
-        End If
-
-        Dim refExpr As String = If(String.IsNullOrEmpty(idCol), "'N/A'", $"CAST({idCol} AS CHAR)")
-        Dim patientExpr As String = If(String.IsNullOrEmpty(patientCol), "''", $"CAST({patientCol} AS CHAR)")
-
-        Return $"SELECT '{activityType}' AS activity_type, {refExpr} AS reference_no, {patientExpr} AS patient_no, {dateCol} AS activity_date FROM {tableName}"
-    End Function
-
-    Private Function BuildTodaysConsultationWorkSelect(conn As MySqlConnection) As String
-        If Not TableExists(conn, "consultation") Then
-            Return ""
-        End If
-
-        Dim idCol As String = GetFirstExistingColumn(conn, "consultation", New String() {"consultation_id", "id"})
-        Dim patientCol As String = GetFirstExistingColumn(conn, "consultation", New String() {"patient_id", "patient_no", "patient"})
-        Dim dateCol As String = GetFirstExistingColumn(conn, "consultation", New String() {"consultation_date", "date", "created_at", "date_created"})
-        Dim statusCol As String = GetFirstExistingColumn(conn, "consultation", New String() {"status"})
-
-        If String.IsNullOrEmpty(dateCol) Then
-            Return ""
-        End If
-
-        Dim refExpr As String = If(String.IsNullOrEmpty(idCol), "'N/A'", $"CAST({idCol} AS CHAR)")
-        Dim patientExpr As String = If(String.IsNullOrEmpty(patientCol), "''", $"CAST({patientCol} AS CHAR)")
-        Dim statusExpr As String = If(String.IsNullOrEmpty(statusCol), "'Scheduled'", $"COALESCE({statusCol}, 'Scheduled')")
-
-        Return $"SELECT 'Consultation' AS work_type, {refExpr} AS reference_no, {patientExpr} AS patient_no, {dateCol} AS work_date, {statusExpr} AS work_status FROM consultation WHERE DATE({dateCol}) = CURDATE()"
-    End Function
-
-    Private Function BuildTodaysLabWorkSelect(conn As MySqlConnection) As String
-        If Not TableExists(conn, "lab_order") Then
-            Return ""
-        End If
-
-        Dim idCol As String = GetFirstExistingColumn(conn, "lab_order", New String() {"lab_order_id", "id"})
-        Dim patientCol As String = GetFirstExistingColumn(conn, "lab_order", New String() {"patient_id", "patient_no", "patient"})
-        Dim dateCol As String = GetFirstExistingColumn(conn, "lab_order", New String() {"order_date", "date", "created_at", "date_created"})
-        Dim statusCol As String = GetFirstExistingColumn(conn, "lab_order", New String() {"status"})
-
-        If String.IsNullOrEmpty(dateCol) Then
-            Return ""
-        End If
-
-        Dim refExpr As String = If(String.IsNullOrEmpty(idCol), "'N/A'", $"CAST({idCol} AS CHAR)")
-        Dim patientExpr As String = If(String.IsNullOrEmpty(patientCol), "''", $"CAST({patientCol} AS CHAR)")
-        Dim statusExpr As String = If(String.IsNullOrEmpty(statusCol), "'Pending'", $"COALESCE({statusCol}, 'Pending')")
-        Dim pendingFilter As String = If(String.IsNullOrEmpty(statusCol), $"DATE({dateCol}) = CURDATE()", $"DATE({dateCol}) = CURDATE() OR LOWER(COALESCE({statusCol}, '')) = 'pending'")
-
-        Return $"SELECT 'Lab Order' AS work_type, {refExpr} AS reference_no, {patientExpr} AS patient_no, {dateCol} AS work_date, {statusExpr} AS work_status FROM lab_order WHERE {pendingFilter}"
+            Return dt
+        Catch
+            Return CreateInfoTable(emptyMessage)
+        End Try
     End Function
 
     Private Function CreateInfoTable(message As String) As DataTable
@@ -347,18 +235,18 @@ Public Class frmDashboard
         Return dt
     End Function
 
-    Private Function TableExists(conn As MySqlConnection, tableName As String) As Boolean
-        Dim sql As String = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = @tableName"
-        Using cmd As New MySqlCommand(sql, conn)
+    Private Function TableExists(tableName As String) As Boolean
+        userSQLQuery = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = @tableName"
+        Using cmd As New MySqlCommand(userSQLQuery, CType(MyConnection, MySqlConnection))
             cmd.Parameters.AddWithValue("@tableName", tableName)
             Return Convert.ToInt32(cmd.ExecuteScalar()) > 0
         End Using
     End Function
 
-    Private Function GetFirstExistingColumn(conn As MySqlConnection, tableName As String, candidates As String()) As String
+    Private Function GetFirstExistingColumn(tableName As String, candidates As String()) As String
         For Each columnName As String In candidates
-            Dim sql As String = "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = @tableName AND column_name = @columnName"
-            Using cmd As New MySqlCommand(sql, conn)
+            userSQLQuery = "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = @tableName AND column_name = @columnName"
+            Using cmd As New MySqlCommand(userSQLQuery, CType(MyConnection, MySqlConnection))
                 cmd.Parameters.AddWithValue("@tableName", tableName)
                 cmd.Parameters.AddWithValue("@columnName", columnName)
                 If Convert.ToInt32(cmd.ExecuteScalar()) > 0 Then
@@ -369,4 +257,8 @@ Public Class frmDashboard
 
         Return ""
     End Function
+
+    Private Sub pbTrustMedLogo_Click(sender As Object, e As EventArgs) Handles pbTrustMedLogo.Click
+
+    End Sub
 End Class
