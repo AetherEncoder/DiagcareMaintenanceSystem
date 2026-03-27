@@ -7,16 +7,16 @@ Public Class frmDashboard
     'Create a Data Adapter variable/object
     '---A Data Adapter is the go-between for the connection object (MyConnection)
     'and the Dataset (borrowerDA)
-    Dim adminDA As New MySqlDataAdapter
+    Dim userDA As New MySqlDataAdapter
 
     'Create a Dataset variable/object
     '---A Data Set is a place holder for the table in your database
     '---There should be one data set for each table in your database
-    Dim adminDS As New DataSet()
+    Dim userDS As New DataSet()
 
     'Declare the connection string and query variables/objects
     Dim MyConnectionString As String
-    Dim adminSQLQuery As String
+    Dim userSQLQuery As String
 
     'Store the logged-in username
     Dim loggedInUsername As String
@@ -55,12 +55,12 @@ Public Class frmDashboard
         End If
 
         If isValid Then
-            adminSQLQuery = "SELECT * FROM admin WHERE username = @username AND password = @password"
+            userSQLQuery = "SELECT * FROM USER WHERE username = @username AND password = @password"
             MyConnection = New MySqlConnection(MyConnectionString)
 
             Try
                 MyConnection.Open()
-                Dim cmd As New MySqlCommand(adminSQLQuery, MyConnection)
+                Dim cmd As New MySqlCommand(userSQLQuery, MyConnection)
                 cmd.Parameters.AddWithValue("@username", txtUsername.Text)
                 cmd.Parameters.AddWithValue("@password", txtPassword.Text)
 

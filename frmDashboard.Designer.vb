@@ -38,8 +38,22 @@ Partial Class frmDashboard
         Me.btnLogout = New System.Windows.Forms.Button()
         Me.lblLoggedInUser = New System.Windows.Forms.Label()
         Me.lblDashboardHeader = New System.Windows.Forms.Label()
+        Me.msDashboardMenu = New System.Windows.Forms.MenuStrip()
+        Me.miOperations = New System.Windows.Forms.ToolStripMenuItem()
+        Me.miMedTech = New System.Windows.Forms.ToolStripMenuItem()
+        Me.miMedicalTest = New System.Windows.Forms.ToolStripMenuItem()
+        Me.miExamination = New System.Windows.Forms.ToolStripMenuItem()
+        Me.miLabOrders = New System.Windows.Forms.ToolStripMenuItem()
+        Me.miConsultation = New System.Windows.Forms.ToolStripMenuItem()
+        Me.miDiagnosis = New System.Windows.Forms.ToolStripMenuItem()
+        Me.miManagement = New System.Windows.Forms.ToolStripMenuItem()
+        Me.miPatients = New System.Windows.Forms.ToolStripMenuItem()
+        Me.miMedicine = New System.Windows.Forms.ToolStripMenuItem()
+        Me.miPrescription = New System.Windows.Forms.ToolStripMenuItem()
+        Me.miPhysician = New System.Windows.Forms.ToolStripMenuItem()
         Me.pnlLoginContainer.SuspendLayout()
         Me.pnlDashboard.SuspendLayout()
+        Me.msDashboardMenu.SuspendLayout()
         Me.SuspendLayout()
         '
         'lblHeader
@@ -171,12 +185,96 @@ Partial Class frmDashboard
         Me.pnlDashboard.Controls.Add(Me.btnLogout)
         Me.pnlDashboard.Controls.Add(Me.lblLoggedInUser)
         Me.pnlDashboard.Controls.Add(Me.lblDashboardHeader)
+        Me.pnlDashboard.Controls.Add(Me.msDashboardMenu)
         Me.pnlDashboard.Dock = System.Windows.Forms.DockStyle.Fill
         Me.pnlDashboard.Location = New System.Drawing.Point(0, 0)
         Me.pnlDashboard.Name = "pnlDashboard"
         Me.pnlDashboard.Size = New System.Drawing.Size(1008, 729)
         Me.pnlDashboard.TabIndex = 11
         Me.pnlDashboard.Visible = False
+        '
+        'msDashboardMenu
+        '
+        Me.msDashboardMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.miOperations, Me.miManagement})
+        Me.msDashboardMenu.Location = New System.Drawing.Point(0, 0)
+        Me.msDashboardMenu.Name = "msDashboardMenu"
+        Me.msDashboardMenu.Size = New System.Drawing.Size(1008, 24)
+        Me.msDashboardMenu.TabIndex = 3
+        Me.msDashboardMenu.Text = "msDashboardMenu"
+        '
+        'miOperations
+        '
+        Me.miOperations.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.miExamination, Me.miLabOrders, Me.miConsultation, Me.miDiagnosis, Me.miPrescription})
+        Me.miOperations.Name = "miOperations"
+        Me.miOperations.Size = New System.Drawing.Size(77, 20)
+        Me.miOperations.Text = "Operations"
+        '
+        'miExamination
+        '
+        Me.miExamination.Name = "miExamination"
+        Me.miExamination.Size = New System.Drawing.Size(180, 22)
+        Me.miExamination.Text = "Examination"
+        '
+        'miLabOrders
+        '
+        Me.miLabOrders.Name = "miLabOrders"
+        Me.miLabOrders.Size = New System.Drawing.Size(180, 22)
+        Me.miLabOrders.Text = "Lab Orders"
+        '
+        'miConsultation
+        '
+        Me.miConsultation.Name = "miConsultation"
+        Me.miConsultation.Size = New System.Drawing.Size(180, 22)
+        Me.miConsultation.Text = "Consultation"
+        '
+        'miDiagnosis
+        '
+        Me.miDiagnosis.Name = "miDiagnosis"
+        Me.miDiagnosis.Size = New System.Drawing.Size(180, 22)
+        Me.miDiagnosis.Text = "Diagnosis"
+        '
+        'miManagement
+        '
+        Me.miManagement.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.miMedTech, Me.miMedicalTest, Me.miPatients, Me.miMedicine, Me.miPhysician})
+        Me.miManagement.Name = "miManagement"
+        Me.miManagement.Size = New System.Drawing.Size(90, 20)
+        Me.miManagement.Text = "Management"
+        '
+        'miMedTech
+        '
+        Me.miMedTech.Name = "miMedTech"
+        Me.miMedTech.Size = New System.Drawing.Size(180, 22)
+        Me.miMedTech.Text = "MedTech"
+        '
+        'miMedicalTest
+        '
+        Me.miMedicalTest.Name = "miMedicalTest"
+        Me.miMedicalTest.Size = New System.Drawing.Size(180, 22)
+        Me.miMedicalTest.Text = "Medical Test"
+        '
+        'miPatients
+        '
+        Me.miPatients.Name = "miPatients"
+        Me.miPatients.Size = New System.Drawing.Size(180, 22)
+        Me.miPatients.Text = "Patients"
+        '
+        'miMedicine
+        '
+        Me.miMedicine.Name = "miMedicine"
+        Me.miMedicine.Size = New System.Drawing.Size(180, 22)
+        Me.miMedicine.Text = "Medicine"
+        '
+        'miPrescription
+        '
+        Me.miPrescription.Name = "miPrescription"
+        Me.miPrescription.Size = New System.Drawing.Size(180, 22)
+        Me.miPrescription.Text = "Prescription"
+        '
+        'miPhysician
+        '
+        Me.miPhysician.Name = "miPhysician"
+        Me.miPhysician.Size = New System.Drawing.Size(180, 22)
+        Me.miPhysician.Text = "Physician"
         '
         'btnLogout
         '
@@ -221,12 +319,15 @@ Partial Class frmDashboard
         Me.Controls.Add(Me.pnlDashboard)
         Me.Controls.Add(Me.pnlLoginContainer)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.MainMenuStrip = Me.msDashboardMenu
         Me.Name = "frmLogin"
         Me.Text = "TrustMed Health Information System"
         Me.pnlLoginContainer.ResumeLayout(False)
         Me.pnlLoginContainer.PerformLayout()
         Me.pnlDashboard.ResumeLayout(False)
         Me.pnlDashboard.PerformLayout()
+        Me.msDashboardMenu.ResumeLayout(False)
+        Me.msDashboardMenu.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -245,5 +346,18 @@ Partial Class frmDashboard
     Friend WithEvents btnLogout As Button
     Friend WithEvents lblLoginError As Label
     Friend WithEvents lblLoggedInUser As Label
+    Friend WithEvents msDashboardMenu As MenuStrip
+    Friend WithEvents miOperations As ToolStripMenuItem
+    Friend WithEvents miMedTech As ToolStripMenuItem
+    Friend WithEvents miMedicalTest As ToolStripMenuItem
+    Friend WithEvents miExamination As ToolStripMenuItem
+    Friend WithEvents miLabOrders As ToolStripMenuItem
+    Friend WithEvents miConsultation As ToolStripMenuItem
+    Friend WithEvents miDiagnosis As ToolStripMenuItem
+    Friend WithEvents miManagement As ToolStripMenuItem
+    Friend WithEvents miPatients As ToolStripMenuItem
+    Friend WithEvents miMedicine As ToolStripMenuItem
+    Friend WithEvents miPrescription As ToolStripMenuItem
+    Friend WithEvents miPhysician As ToolStripMenuItem
 
 End Class
