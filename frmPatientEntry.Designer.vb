@@ -18,6 +18,8 @@ Partial Class frmPatientEntry
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmPatientEntry))
+        Me.lblPatientID = New System.Windows.Forms.Label()
+        Me.txtPatientID = New System.Windows.Forms.TextBox()
         Me.lblFirstName = New System.Windows.Forms.Label()
         Me.txtFirstName = New System.Windows.Forms.TextBox()
         Me.lblLastName = New System.Windows.Forms.Label()
@@ -40,144 +42,161 @@ Partial Class frmPatientEntry
         Me.btnCancel = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
+        'lblPatientID
+        '
+        Me.lblPatientID.Location = New System.Drawing.Point(20, 24)
+        Me.lblPatientID.Name = "lblPatientID"
+        Me.lblPatientID.Size = New System.Drawing.Size(130, 24)
+        Me.lblPatientID.TabIndex = 0
+        Me.lblPatientID.Text = "Patient ID *:"
+        '
+        'txtPatientID
+        '
+        Me.txtPatientID.Location = New System.Drawing.Point(160, 20)
+        Me.txtPatientID.Name = "txtPatientID"
+        Me.txtPatientID.ReadOnly = True
+        Me.txtPatientID.Size = New System.Drawing.Size(330, 20)
+        Me.txtPatientID.TabIndex = 1
+        Me.txtPatientID.TabStop = False
+        '
         'lblFirstName
         '
-        Me.lblFirstName.Location = New System.Drawing.Point(20, 24)
+        Me.lblFirstName.Location = New System.Drawing.Point(20, 62)
         Me.lblFirstName.Name = "lblFirstName"
         Me.lblFirstName.Size = New System.Drawing.Size(130, 24)
-        Me.lblFirstName.TabIndex = 0
-        Me.lblFirstName.Text = "First Name:"
+        Me.lblFirstName.TabIndex = 2
+        Me.lblFirstName.Text = "First Name *:"
         '
         'txtFirstName
         '
-        Me.txtFirstName.Location = New System.Drawing.Point(160, 20)
+        Me.txtFirstName.Location = New System.Drawing.Point(160, 58)
         Me.txtFirstName.Name = "txtFirstName"
         Me.txtFirstName.Size = New System.Drawing.Size(330, 20)
-        Me.txtFirstName.TabIndex = 1
+        Me.txtFirstName.TabIndex = 3
         '
         'lblLastName
         '
-        Me.lblLastName.Location = New System.Drawing.Point(20, 62)
+        Me.lblLastName.Location = New System.Drawing.Point(20, 100)
         Me.lblLastName.Name = "lblLastName"
         Me.lblLastName.Size = New System.Drawing.Size(130, 24)
-        Me.lblLastName.TabIndex = 2
-        Me.lblLastName.Text = "Last Name:"
+        Me.lblLastName.TabIndex = 4
+        Me.lblLastName.Text = "Last Name *:"
         '
         'txtLastName
         '
-        Me.txtLastName.Location = New System.Drawing.Point(160, 58)
+        Me.txtLastName.Location = New System.Drawing.Point(160, 96)
         Me.txtLastName.Name = "txtLastName"
         Me.txtLastName.Size = New System.Drawing.Size(330, 20)
-        Me.txtLastName.TabIndex = 3
+        Me.txtLastName.TabIndex = 5
         '
         'lblSex
         '
-        Me.lblSex.Location = New System.Drawing.Point(20, 100)
+        Me.lblSex.Location = New System.Drawing.Point(20, 138)
         Me.lblSex.Name = "lblSex"
         Me.lblSex.Size = New System.Drawing.Size(130, 24)
-        Me.lblSex.TabIndex = 4
-        Me.lblSex.Text = "Sex:"
+        Me.lblSex.TabIndex = 6
+        Me.lblSex.Text = "Sex *:"
         '
         'cboSex
         '
         Me.cboSex.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboSex.FormattingEnabled = True
         Me.cboSex.Items.AddRange(New Object() {"Male", "Female"})
-        Me.cboSex.Location = New System.Drawing.Point(160, 96)
+        Me.cboSex.Location = New System.Drawing.Point(160, 134)
         Me.cboSex.Name = "cboSex"
         Me.cboSex.Size = New System.Drawing.Size(330, 21)
-        Me.cboSex.TabIndex = 5
+        Me.cboSex.TabIndex = 7
         '
         'lblDateOfBirth
         '
-        Me.lblDateOfBirth.Location = New System.Drawing.Point(20, 138)
+        Me.lblDateOfBirth.Location = New System.Drawing.Point(20, 176)
         Me.lblDateOfBirth.Name = "lblDateOfBirth"
         Me.lblDateOfBirth.Size = New System.Drawing.Size(130, 24)
-        Me.lblDateOfBirth.TabIndex = 6
-        Me.lblDateOfBirth.Text = "Date Of Birth:"
+        Me.lblDateOfBirth.TabIndex = 8
+        Me.lblDateOfBirth.Text = "Date Of Birth *:"
         '
         'dtpDateOfBirth
         '
         Me.dtpDateOfBirth.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtpDateOfBirth.Location = New System.Drawing.Point(160, 134)
+        Me.dtpDateOfBirth.Location = New System.Drawing.Point(160, 172)
         Me.dtpDateOfBirth.Name = "dtpDateOfBirth"
         Me.dtpDateOfBirth.Size = New System.Drawing.Size(330, 20)
-        Me.dtpDateOfBirth.TabIndex = 7
+        Me.dtpDateOfBirth.TabIndex = 9
         '
         'lblPhoneNumber
         '
-        Me.lblPhoneNumber.Location = New System.Drawing.Point(20, 176)
+        Me.lblPhoneNumber.Location = New System.Drawing.Point(20, 214)
         Me.lblPhoneNumber.Name = "lblPhoneNumber"
         Me.lblPhoneNumber.Size = New System.Drawing.Size(130, 24)
-        Me.lblPhoneNumber.TabIndex = 8
-        Me.lblPhoneNumber.Text = "Phone Number:"
+        Me.lblPhoneNumber.TabIndex = 10
+        Me.lblPhoneNumber.Text = "Phone Number *:"
         '
         'txtPhoneNumber
         '
-        Me.txtPhoneNumber.Location = New System.Drawing.Point(160, 172)
+        Me.txtPhoneNumber.Location = New System.Drawing.Point(160, 210)
         Me.txtPhoneNumber.Name = "txtPhoneNumber"
         Me.txtPhoneNumber.Size = New System.Drawing.Size(330, 20)
-        Me.txtPhoneNumber.TabIndex = 9
+        Me.txtPhoneNumber.TabIndex = 11
         '
         'lblHouseNumber
         '
-        Me.lblHouseNumber.Location = New System.Drawing.Point(20, 214)
+        Me.lblHouseNumber.Location = New System.Drawing.Point(20, 252)
         Me.lblHouseNumber.Name = "lblHouseNumber"
         Me.lblHouseNumber.Size = New System.Drawing.Size(130, 24)
-        Me.lblHouseNumber.TabIndex = 10
-        Me.lblHouseNumber.Text = "House Number:"
+        Me.lblHouseNumber.TabIndex = 12
+        Me.lblHouseNumber.Text = "House Number *:"
         '
         'txtHouseNumber
         '
-        Me.txtHouseNumber.Location = New System.Drawing.Point(160, 210)
+        Me.txtHouseNumber.Location = New System.Drawing.Point(160, 248)
         Me.txtHouseNumber.Name = "txtHouseNumber"
         Me.txtHouseNumber.Size = New System.Drawing.Size(330, 20)
-        Me.txtHouseNumber.TabIndex = 11
+        Me.txtHouseNumber.TabIndex = 13
         '
         'lblStreet
         '
-        Me.lblStreet.Location = New System.Drawing.Point(20, 252)
+        Me.lblStreet.Location = New System.Drawing.Point(20, 290)
         Me.lblStreet.Name = "lblStreet"
         Me.lblStreet.Size = New System.Drawing.Size(130, 24)
-        Me.lblStreet.TabIndex = 12
-        Me.lblStreet.Text = "Street:"
+        Me.lblStreet.TabIndex = 14
+        Me.lblStreet.Text = "Street *:"
         '
         'txtStreet
         '
-        Me.txtStreet.Location = New System.Drawing.Point(160, 248)
+        Me.txtStreet.Location = New System.Drawing.Point(160, 286)
         Me.txtStreet.Name = "txtStreet"
         Me.txtStreet.Size = New System.Drawing.Size(330, 20)
-        Me.txtStreet.TabIndex = 13
+        Me.txtStreet.TabIndex = 15
         '
         'lblCity
         '
-        Me.lblCity.Location = New System.Drawing.Point(20, 290)
+        Me.lblCity.Location = New System.Drawing.Point(20, 328)
         Me.lblCity.Name = "lblCity"
         Me.lblCity.Size = New System.Drawing.Size(130, 24)
-        Me.lblCity.TabIndex = 14
-        Me.lblCity.Text = "City:"
+        Me.lblCity.TabIndex = 16
+        Me.lblCity.Text = "City *:"
         '
         'txtCity
         '
-        Me.txtCity.Location = New System.Drawing.Point(160, 286)
+        Me.txtCity.Location = New System.Drawing.Point(160, 324)
         Me.txtCity.Name = "txtCity"
         Me.txtCity.Size = New System.Drawing.Size(330, 20)
-        Me.txtCity.TabIndex = 15
+        Me.txtCity.TabIndex = 17
         '
         'lblProvince
         '
-        Me.lblProvince.Location = New System.Drawing.Point(20, 328)
+        Me.lblProvince.Location = New System.Drawing.Point(20, 366)
         Me.lblProvince.Name = "lblProvince"
         Me.lblProvince.Size = New System.Drawing.Size(130, 24)
-        Me.lblProvince.TabIndex = 16
-        Me.lblProvince.Text = "Province:"
+        Me.lblProvince.TabIndex = 18
+        Me.lblProvince.Text = "Province *:"
         '
         'txtProvince
         '
-        Me.txtProvince.Location = New System.Drawing.Point(160, 324)
+        Me.txtProvince.Location = New System.Drawing.Point(160, 362)
         Me.txtProvince.Name = "txtProvince"
         Me.txtProvince.Size = New System.Drawing.Size(330, 20)
-        Me.txtProvince.TabIndex = 17
+        Me.txtProvince.TabIndex = 19
         '
         'btnSave
         '
@@ -186,7 +205,7 @@ Partial Class frmPatientEntry
         Me.btnSave.Location = New System.Drawing.Point(300, 418)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(90, 34)
-        Me.btnSave.TabIndex = 18
+        Me.btnSave.TabIndex = 20
         Me.btnSave.Text = "Save"
         Me.btnSave.UseVisualStyleBackColor = False
         '
@@ -195,7 +214,7 @@ Partial Class frmPatientEntry
         Me.btnCancel.Location = New System.Drawing.Point(400, 418)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(90, 34)
-        Me.btnCancel.TabIndex = 19
+        Me.btnCancel.TabIndex = 21
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
@@ -224,6 +243,8 @@ Partial Class frmPatientEntry
         Me.Controls.Add(Me.lblLastName)
         Me.Controls.Add(Me.txtFirstName)
         Me.Controls.Add(Me.lblFirstName)
+        Me.Controls.Add(Me.txtPatientID)
+        Me.Controls.Add(Me.lblPatientID)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmPatientEntry"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
@@ -233,6 +254,8 @@ Partial Class frmPatientEntry
 
     End Sub
 
+    Friend WithEvents lblPatientID As Label
+    Friend WithEvents txtPatientID As TextBox
     Friend WithEvents lblFirstName As Label
     Friend WithEvents txtFirstName As TextBox
     Friend WithEvents lblLastName As Label
