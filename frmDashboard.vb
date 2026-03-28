@@ -486,8 +486,21 @@ Public Class frmDashboard
     End Sub
 
     Private Sub BtnAddPatient_Click(sender As Object, e As EventArgs)
-        If currentSectionName = "Patients" Then
+        Dim sectionName As String = If(currentSectionName, "").ToLowerInvariant()
+        Dim singular As String = If(currentSectionSingular, "").ToLowerInvariant()
+
+        If sectionName = "physicians" OrElse singular = "physician" Then
+            OpenPhysicianEntryDialog()
+            Return
+        End If
+
+        If sectionName = "patients" OrElse singular = "patient" Then
             OpenPatientEntryDialog()
+            Return
+        End If
+
+        If sectionName = "medtechs" OrElse singular = "medtech" Then
+            OpenMedTechEntryDialog()
             Return
         End If
 
@@ -505,6 +518,38 @@ Public Class frmDashboard
                     Dim sectionQuery As String = ""
                     GetSectionConfig("patients", sectionTitle, sectionSingular, sectionQuery)
                     LoadSectionData("patients", sectionQuery)
+                End If
+            End If
+        End Using
+    End Sub
+
+    Private Sub OpenPhysicianEntryDialog()
+        Using physicianEntry As New frmPhysicianEntry(MyConnectionString)
+            If physicianEntry.ShowDialog(Me) = DialogResult.OK Then
+                LoadDashboardOverview()
+
+                If pnlPatientsSection IsNot Nothing AndAlso pnlPatientsSection.Visible Then
+                    Dim sectionTitle As String = ""
+                    Dim sectionSingular As String = ""
+                    Dim sectionQuery As String = ""
+                    GetSectionConfig("physicians", sectionTitle, sectionSingular, sectionQuery)
+                    LoadSectionData("physicians", sectionQuery)
+                End If
+            End If
+        End Using
+    End Sub
+
+    Private Sub OpenMedTechEntryDialog()
+        Using medtechEntry As New frmMedTechEntry(MyConnectionString)
+            If medtechEntry.ShowDialog(Me) = DialogResult.OK Then
+                LoadDashboardOverview()
+
+                If pnlPatientsSection IsNot Nothing AndAlso pnlPatientsSection.Visible Then
+                    Dim sectionTitle As String = ""
+                    Dim sectionSingular As String = ""
+                    Dim sectionQuery As String = ""
+                    GetSectionConfig("medtechs", sectionTitle, sectionSingular, sectionQuery)
+                    LoadSectionData("medtechs", sectionQuery)
                 End If
             End If
         End Using

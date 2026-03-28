@@ -81,10 +81,22 @@
       <DependentUpon>frmDashboard.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="frmMedTechEntry.Designer.vb">
+      <DependentUpon>frmMedTechEntry.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmMedTechEntry.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="frmPatientEntry.Designer.vb">
       <DependentUpon>frmPatientEntry.vb</DependentUpon>
     </Compile>
     <Compile Include="frmPatientEntry.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPhysicianEntry.Designer.vb">
+      <DependentUpon>frmPhysicianEntry.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPhysicianEntry.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
