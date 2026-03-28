@@ -137,7 +137,7 @@ Public Class frmDashboard
     End Sub
 
     Private Sub btnNewLabOrder_Click(sender As Object, e As EventArgs) Handles btnNewLabOrder.Click
-        ShowQuickActionPlaceholder("New Lab Order")
+        OpenLabOrderEntryDialog()
     End Sub
 
     Private Sub btnNewPrescription_Click(sender As Object, e As EventArgs) Handles btnNewPrescription.Click
@@ -514,6 +514,11 @@ Public Class frmDashboard
             Return
         End If
 
+        If sectionName = "lab orders" OrElse singular = "lab order" Then
+            OpenLabOrderEntryDialog()
+            Return
+        End If
+
         ShowQuickActionPlaceholder("Add New " & currentSectionSingular)
     End Sub
 
@@ -580,6 +585,22 @@ Public Class frmDashboard
                     Dim sectionQuery As String = ""
                     GetSectionConfig("medicines", sectionTitle, sectionSingular, sectionQuery)
                     LoadSectionData("medicines", sectionQuery)
+                End If
+            End If
+        End Using
+    End Sub
+
+    Private Sub OpenLabOrderEntryDialog()
+        Using labOrderEntry As New frmLabOrderEntry(MyConnectionString)
+            If labOrderEntry.ShowDialog(Me) = DialogResult.OK Then
+                LoadDashboardOverview()
+
+                If pnlPatientsSection IsNot Nothing AndAlso pnlPatientsSection.Visible Then
+                    Dim sectionTitle As String = ""
+                    Dim sectionSingular As String = ""
+                    Dim sectionQuery As String = ""
+                    GetSectionConfig("laborders", sectionTitle, sectionSingular, sectionQuery)
+                    LoadSectionData("laborders", sectionQuery)
                 End If
             End If
         End Using
