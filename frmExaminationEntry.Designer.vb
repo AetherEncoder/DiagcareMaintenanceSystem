@@ -31,6 +31,12 @@ Partial Class frmExaminationEntry
         Me.btnRemoveLabTest = New System.Windows.Forms.Button()
         Me.lblSelectedLabTests = New System.Windows.Forms.Label()
         Me.lstSelectedLabTests = New System.Windows.Forms.ListBox()
+        Me.lblMedTech = New System.Windows.Forms.Label()
+        Me.cboMedTech = New System.Windows.Forms.ComboBox()
+        Me.btnAddMedTech = New System.Windows.Forms.Button()
+        Me.btnRemoveMedTech = New System.Windows.Forms.Button()
+        Me.lblSelectedMedTechs = New System.Windows.Forms.Label()
+        Me.lstSelectedMedTechs = New System.Windows.Forms.ListBox()
         Me.btnSave = New System.Windows.Forms.Button()
         Me.btnCancel = New System.Windows.Forms.Button()
         Me.SuspendLayout()
@@ -156,23 +162,76 @@ Partial Class frmExaminationEntry
         Me.lstSelectedLabTests.Size = New System.Drawing.Size(230, 95)
         Me.lstSelectedLabTests.TabIndex = 13
         '
+        'lblMedTech
+        '
+        Me.lblMedTech.Location = New System.Drawing.Point(20, 381)
+        Me.lblMedTech.Name = "lblMedTech"
+        Me.lblMedTech.Size = New System.Drawing.Size(130, 24)
+        Me.lblMedTech.TabIndex = 14
+        Me.lblMedTech.Text = "MedTech *:"
+        '
+        'cboMedTech
+        '
+        Me.cboMedTech.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
+        Me.cboMedTech.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
+        Me.cboMedTech.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
+        Me.cboMedTech.FormattingEnabled = True
+        Me.cboMedTech.Location = New System.Drawing.Point(160, 377)
+        Me.cboMedTech.Name = "cboMedTech"
+        Me.cboMedTech.Size = New System.Drawing.Size(230, 21)
+        Me.cboMedTech.TabIndex = 15
+        '
+        'btnAddMedTech
+        '
+        Me.btnAddMedTech.Location = New System.Drawing.Point(396, 375)
+        Me.btnAddMedTech.Name = "btnAddMedTech"
+        Me.btnAddMedTech.Size = New System.Drawing.Size(94, 24)
+        Me.btnAddMedTech.TabIndex = 16
+        Me.btnAddMedTech.Text = "Add MedTech"
+        Me.btnAddMedTech.UseVisualStyleBackColor = True
+        '
+        'btnRemoveMedTech
+        '
+        Me.btnRemoveMedTech.Location = New System.Drawing.Point(396, 408)
+        Me.btnRemoveMedTech.Name = "btnRemoveMedTech"
+        Me.btnRemoveMedTech.Size = New System.Drawing.Size(94, 24)
+        Me.btnRemoveMedTech.TabIndex = 17
+        Me.btnRemoveMedTech.Text = "Remove"
+        Me.btnRemoveMedTech.UseVisualStyleBackColor = True
+        '
+        'lblSelectedMedTechs
+        '
+        Me.lblSelectedMedTechs.Location = New System.Drawing.Point(20, 410)
+        Me.lblSelectedMedTechs.Name = "lblSelectedMedTechs"
+        Me.lblSelectedMedTechs.Size = New System.Drawing.Size(130, 24)
+        Me.lblSelectedMedTechs.TabIndex = 18
+        Me.lblSelectedMedTechs.Text = "Selected MedTechs *:"
+        '
+        'lstSelectedMedTechs
+        '
+        Me.lstSelectedMedTechs.FormattingEnabled = True
+        Me.lstSelectedMedTechs.Location = New System.Drawing.Point(160, 408)
+        Me.lstSelectedMedTechs.Name = "lstSelectedMedTechs"
+        Me.lstSelectedMedTechs.Size = New System.Drawing.Size(230, 95)
+        Me.lstSelectedMedTechs.TabIndex = 19
+        '
         'btnSave
         '
         Me.btnSave.BackColor = System.Drawing.Color.DarkBlue
         Me.btnSave.ForeColor = System.Drawing.Color.White
-        Me.btnSave.Location = New System.Drawing.Point(300, 382)
+        Me.btnSave.Location = New System.Drawing.Point(300, 523)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(90, 34)
-        Me.btnSave.TabIndex = 14
+        Me.btnSave.TabIndex = 20
         Me.btnSave.Text = "Save"
         Me.btnSave.UseVisualStyleBackColor = False
         '
         'btnCancel
         '
-        Me.btnCancel.Location = New System.Drawing.Point(400, 382)
+        Me.btnCancel.Location = New System.Drawing.Point(400, 523)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(90, 34)
-        Me.btnCancel.TabIndex = 15
+        Me.btnCancel.TabIndex = 21
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
@@ -180,9 +239,15 @@ Partial Class frmExaminationEntry
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(520, 435)
+        Me.ClientSize = New System.Drawing.Size(520, 580)
         Me.Controls.Add(Me.btnCancel)
         Me.Controls.Add(Me.btnSave)
+        Me.Controls.Add(Me.lstSelectedMedTechs)
+        Me.Controls.Add(Me.lblSelectedMedTechs)
+        Me.Controls.Add(Me.btnRemoveMedTech)
+        Me.Controls.Add(Me.btnAddMedTech)
+        Me.Controls.Add(Me.cboMedTech)
+        Me.Controls.Add(Me.lblMedTech)
         Me.Controls.Add(Me.lstSelectedLabTests)
         Me.Controls.Add(Me.lblSelectedLabTests)
         Me.Controls.Add(Me.btnRemoveLabTest)
@@ -219,6 +284,12 @@ Partial Class frmExaminationEntry
     Friend WithEvents btnRemoveLabTest As Button
     Friend WithEvents lblSelectedLabTests As Label
     Friend WithEvents lstSelectedLabTests As ListBox
+    Friend WithEvents lblMedTech As Label
+    Friend WithEvents cboMedTech As ComboBox
+    Friend WithEvents btnAddMedTech As Button
+    Friend WithEvents btnRemoveMedTech As Button
+    Friend WithEvents lblSelectedMedTechs As Label
+    Friend WithEvents lstSelectedMedTechs As ListBox
     Friend WithEvents btnSave As Button
     Friend WithEvents btnCancel As Button
 End Class

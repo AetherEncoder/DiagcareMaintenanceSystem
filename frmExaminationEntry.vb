@@ -3,9 +3,19 @@
 Public Class frmExaminationEntry
     Private ReadOnly _connectionString As String
     Private ReadOnly _selectedLabTests As New List(Of LabTestSelectionItem)()
+    Private ReadOnly _selectedMedTechs As New List(Of MedTechSelectionItem)()
 
     Private Class LabTestSelectionItem
         Public Property TestID As Integer
+        Public Property DisplayName As String
+
+        Public Overrides Function ToString() As String
+            Return DisplayName
+        End Function
+    End Class
+
+    Private Class MedTechSelectionItem
+        Public Property MedTechID As Integer
         Public Property DisplayName As String
 
         Public Overrides Function ToString() As String
@@ -26,7 +36,9 @@ Public Class frmExaminationEntry
         LoadNextExaminationId()
         LoadPatientOptions()
         LoadLabTestOptions()
+        LoadMedTechOptions()
         RefreshSelectedLabTestsList()
+        RefreshSelectedMedTechsList()
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
@@ -77,9 +89,62 @@ Public Class frmExaminationEntry
         RefreshSelectedLabTestsList()
     End Sub
 
+    Private Sub btnAddMedTech_Click(sender As Object, e As EventArgs) Handles btnAddMedTech.Click
+        If cboMedTech.SelectedIndex < 0 OrElse cboMedTech.SelectedValue Is Nothing OrElse TypeOf cboMedTech.SelectedValue Is DataRowView Then
+            MessageBox.Show("Select a MedTech to add.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            cboMedTech.Focus()
+            Return
+        End If
+
+        Dim medTechId As Integer = Convert.ToInt32(cboMedTech.SelectedValue)
+        If IsMedTechAlreadySelected(medTechId) Then
+            MessageBox.Show("MedTech is already added.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        _selectedMedTechs.Add(New MedTechSelectionItem With {
+            .MedTechID = medTechId,
+            .DisplayName = cboMedTech.Text.Trim()
+        })
+
+        RefreshSelectedMedTechsList()
+        cboMedTech.SelectedIndex = -1
+        cboMedTech.Focus()
+    End Sub
+
+    Private Sub btnRemoveMedTech_Click(sender As Object, e As EventArgs) Handles btnRemoveMedTech.Click
+        If lstSelectedMedTechs.SelectedItem Is Nothing Then
+            MessageBox.Show("Select a MedTech from the list to remove.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            lstSelectedMedTechs.Focus()
+            Return
+        End If
+
+        Dim selectedItem As MedTechSelectionItem = TryCast(lstSelectedMedTechs.SelectedItem, MedTechSelectionItem)
+        If selectedItem Is Nothing Then Return
+
+        For i As Integer = _selectedMedTechs.Count - 1 To 0 Step -1
+            If _selectedMedTechs(i).MedTechID = selectedItem.MedTechID Then
+                _selectedMedTechs.RemoveAt(i)
+                Exit For
+            End If
+        Next
+
+        RefreshSelectedMedTechsList()
+    End Sub
+
     Private Function IsLabTestAlreadySelected(testId As Integer) As Boolean
         For Each item As LabTestSelectionItem In _selectedLabTests
             If item.TestID = testId Then
+                Return True
+            End If
+        Next
+
+        Return False
+    End Function
+
+    Private Function IsMedTechAlreadySelected(medTechId As Integer) As Boolean
+        For Each item As MedTechSelectionItem In _selectedMedTechs
+            If item.MedTechID = medTechId Then
                 Return True
             End If
         Next
@@ -95,6 +160,14 @@ Public Class frmExaminationEntry
         Next
     End Sub
 
+    Private Sub RefreshSelectedMedTechsList()
+        lstSelectedMedTechs.Items.Clear()
+
+        For Each item As MedTechSelectionItem In _selectedMedTechs
+            lstSelectedMedTechs.Items.Add(item)
+        Next
+    End Sub
+
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         If Not ValidateInputs() Then
             Return
@@ -107,17 +180,19 @@ Public Class frmExaminationEntry
         End If
 
         Dim patientId As Integer = Convert.ToInt32(cboPatient.SelectedValue)
+        Dim medTechId As Integer = Convert.ToInt32(cboMedTech.SelectedValue)
 
         Try
             Using conn As New MySqlConnection(_connectionString)
                 conn.Open()
 
-                Dim examSql As String = "INSERT INTO examination (ExaminationID, PatientID, Result, DatePerformed) VALUES (@ExaminationID, @PatientID, @Result, @DatePerformed)"
+                Dim examSql As String = "INSERT INTO examination (ExaminationID, PatientID, Result, DatePerformed, MedTechID) VALUES (@ExaminationID, @PatientID, @Result, @DatePerformed, @MedTechID)"
                 Using examCmd As New MySqlCommand(examSql, conn)
                     examCmd.Parameters.AddWithValue("@ExaminationID", examinationId)
                     examCmd.Parameters.AddWithValue("@PatientID", patientId)
                     examCmd.Parameters.AddWithValue("@Result", txtResult.Text.Trim())
                     examCmd.Parameters.AddWithValue("@DatePerformed", dtpDatePerformed.Value.Date)
+                    examCmd.Parameters.AddWithValue("@MedTechID", medTechId)
                     examCmd.ExecuteNonQuery()
                 End Using
 
@@ -127,6 +202,15 @@ Public Class frmExaminationEntry
                         inclusionCmd.Parameters.AddWithValue("@TestID", labTest.TestID)
                         inclusionCmd.Parameters.AddWithValue("@ExaminationID", examinationId)
                         inclusionCmd.ExecuteNonQuery()
+                    End Using
+                Next
+
+                Dim performanceSql As String = "INSERT INTO performance (MedtechID, ExaminationID) VALUES (@MedtechID, @ExaminationID)"
+                For Each medTech As MedTechSelectionItem In _selectedMedTechs
+                    Using performanceCmd As New MySqlCommand(performanceSql, conn)
+                        performanceCmd.Parameters.AddWithValue("@MedtechID", medTech.MedTechID)
+                        performanceCmd.Parameters.AddWithValue("@ExaminationID", examinationId)
+                        performanceCmd.ExecuteNonQuery()
                     End Using
                 Next
             End Using
@@ -165,6 +249,12 @@ Public Class frmExaminationEntry
         If _selectedLabTests.Count = 0 Then
             MessageBox.Show("Add at least one laboratory test.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             cboLabTest.Focus()
+            Return False
+        End If
+
+        If _selectedMedTechs.Count = 0 Then
+            MessageBox.Show("Add at least one MedTech performer.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            cboMedTech.Focus()
             Return False
         End If
 
@@ -226,6 +316,35 @@ Public Class frmExaminationEntry
         Catch ex As Exception
             cboLabTest.DataSource = Nothing
             MessageBox.Show("Unable to load laboratory tests: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub LoadMedTechOptions()
+        If String.IsNullOrWhiteSpace(_connectionString) Then
+            cboMedTech.DataSource = Nothing
+            Return
+        End If
+
+        Try
+            Using conn As New MySqlConnection(_connectionString)
+                conn.Open()
+
+                Dim medTechTable As New DataTable()
+                Dim medTechSql As String = "SELECT MedtechID, CONCAT(FirstName, ' ', LastName, ' (', MedtechID, ')') AS FullName FROM medtech ORDER BY FirstName, LastName"
+                Using cmd As New MySqlCommand(medTechSql, conn)
+                    Using adapter As New MySqlDataAdapter(cmd)
+                        adapter.Fill(medTechTable)
+                    End Using
+                End Using
+
+                cboMedTech.DataSource = medTechTable
+                cboMedTech.DisplayMember = "FullName"
+                cboMedTech.ValueMember = "MedtechID"
+                cboMedTech.SelectedIndex = -1
+            End Using
+        Catch ex As Exception
+            cboMedTech.DataSource = Nothing
+            MessageBox.Show("Unable to load MedTechs: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
