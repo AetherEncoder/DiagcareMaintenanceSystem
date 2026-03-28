@@ -545,19 +545,7 @@ Public Class frmDashboard
     End Sub
 
     Private Sub OpenMedTechEntryDialog()
-        Using medtechEntry As New frmMedTechEntry(MyConnectionString)
-            If medtechEntry.ShowDialog(Me) = DialogResult.OK Then
-                LoadDashboardOverview()
-
-                If pnlPatientsSection IsNot Nothing AndAlso pnlPatientsSection.Visible Then
-                    Dim sectionTitle As String = ""
-                    Dim sectionSingular As String = ""
-                    Dim sectionQuery As String = ""
-                    GetSectionConfig("medtechs", sectionTitle, sectionSingular, sectionQuery)
-                    LoadSectionData("medtechs", sectionQuery)
-                End If
-            End If
-        End Using
+        ShowQuickActionPlaceholder("Add New MedTech")
     End Sub
 
     Private Sub OpenPrescriptionEntryDialog()

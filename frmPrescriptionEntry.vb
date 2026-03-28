@@ -1,6 +1,7 @@
 ﻿Imports MySql.Data.MySqlClient
 
-Public Class frmPrescriptionEntry
+Partial Class frmPrescriptionEntry
+
     Private ReadOnly _connectionString As String
 
     Public Sub New()
@@ -27,21 +28,22 @@ Public Class frmPrescriptionEntry
         End If
 
         Dim prescriptionId As Integer
-        If Not Integer.TryParse(txtPrescriptionID.Text, prescriptionId) Then
+        Dim physicianId As Integer
+        Dim patientId As Integer
+
+        If Not Integer.TryParse(txtPrescriptionID.Text.Trim(), prescriptionId) Then
             MessageBox.Show("Invalid Prescription ID.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
-        Dim physicianId As Integer
         If Not Integer.TryParse(txtPhysicianID.Text.Trim(), physicianId) Then
-            MessageBox.Show("Physician ID must be a valid number.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("Physician ID must be numeric.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             txtPhysicianID.Focus()
             Return
         End If
 
-        Dim patientId As Integer
         If Not Integer.TryParse(txtPatientID.Text.Trim(), patientId) Then
-            MessageBox.Show("Patient ID must be a valid number.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            MessageBox.Show("Patient ID must be numeric.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             txtPatientID.Focus()
             Return
         End If
@@ -68,31 +70,6 @@ Public Class frmPrescriptionEntry
             Me.Close()
         Catch ex As Exception
             MessageBox.Show("Unable to save prescription: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
-    End Sub
-
-    Private Sub LoadNextPrescriptionId()
-        If String.IsNullOrWhiteSpace(_connectionString) Then
-            txtPrescriptionID.Text = ""
-            Return
-        End If
-
-        Try
-            Using conn As New MySqlConnection(_connectionString)
-                conn.Open()
-
-                Dim newPrescriptionId As Integer = GetNextAvailablePrescriptionId(conn)
-                If newPrescriptionId = -1 Then
-                    txtPrescriptionID.Text = ""
-                    MessageBox.Show("No available PrescriptionID in range 90001 to 99999.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                    Return
-                End If
-
-                txtPrescriptionID.Text = newPrescriptionId.ToString()
-            End Using
-        Catch ex As Exception
-            txtPrescriptionID.Text = ""
-            MessageBox.Show("Unable to generate prescription ID: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
@@ -127,6 +104,31 @@ Public Class frmPrescriptionEntry
 
         Return True
     End Function
+
+    Private Sub LoadNextPrescriptionId()
+        If String.IsNullOrWhiteSpace(_connectionString) Then
+            txtPrescriptionID.Text = ""
+            Return
+        End If
+
+        Try
+            Using conn As New MySqlConnection(_connectionString)
+                conn.Open()
+
+                Dim newPrescriptionId As Integer = GetNextAvailablePrescriptionId(conn)
+                If newPrescriptionId = -1 Then
+                    txtPrescriptionID.Text = ""
+                    MessageBox.Show("No available PrescriptionID in range 90001 to 99999.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return
+                End If
+
+                txtPrescriptionID.Text = newPrescriptionId.ToString()
+            End Using
+        Catch ex As Exception
+            txtPrescriptionID.Text = ""
+            MessageBox.Show("Unable to generate prescription ID: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
 
     Private Function GetNextAvailablePrescriptionId(conn As MySqlConnection) As Integer
         Const minId As Integer = 90001
