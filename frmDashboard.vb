@@ -24,6 +24,7 @@ Public Class frmDashboard
     Dim row As Integer
     Private currentSectionName As String = "Patients"
     Private currentSectionSingular As String = "Patient"
+    Private currentSectionKey As String = "patients"
 
     Private patientsSectionInitialized As Boolean = False
     Private pnlPatientsSection As Panel
@@ -376,6 +377,7 @@ Public Class frmDashboard
         Dim sectionQuery As String = ""
         GetSectionConfig(sectionKey, sectionTitle, sectionSingular, sectionQuery)
 
+        currentSectionKey = sectionKey.ToLowerInvariant()
         currentSectionName = sectionTitle
         currentSectionSingular = sectionSingular
 
@@ -747,8 +749,102 @@ Public Class frmDashboard
     End Sub
 
     Private Sub BtnDeletePatient_Click(sender As Object, e As EventArgs)
-        ShowQuickActionPlaceholder("Delete " & currentSectionSingular)
+        If dgvPatients Is Nothing OrElse dgvPatients.SelectedRows.Count = 0 Then
+            MessageBox.Show("Select a row to delete.", "Delete", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        Dim tableName As String = ""
+        Dim keyColumn As String = ""
+        If Not TryGetDeleteConfig(currentSectionKey, tableName, keyColumn) Then
+            ShowQuickActionPlaceholder("Delete " & currentSectionSingular)
+            Return
+        End If
+
+        If Not dgvPatients.Columns.Contains(keyColumn) Then
+            MessageBox.Show("Unable to delete selected row from this view.", "Delete", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        Dim selectedRow As DataGridViewRow = dgvPatients.SelectedRows(0)
+        Dim keyValue As Object = selectedRow.Cells(keyColumn).Value
+        If keyValue Is Nothing OrElse keyValue Is DBNull.Value Then
+            MessageBox.Show("Unable to resolve selected row ID.", "Delete", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        Dim confirmMessage As String = "Are you sure you want to delete this " & currentSectionSingular.ToLowerInvariant() & "?"
+        If MessageBox.Show(confirmMessage, "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) <> DialogResult.Yes Then
+            Return
+        End If
+
+        Try
+            Using conn As New MySqlConnection(MyConnectionString)
+                conn.Open()
+
+                Dim sql As String = "DELETE FROM " & tableName & " WHERE " & keyColumn & " = @id"
+                Using cmd As New MySqlCommand(sql, conn)
+                    cmd.Parameters.AddWithValue("@id", keyValue)
+                    Dim affectedRows As Integer = cmd.ExecuteNonQuery()
+
+                    If affectedRows = 0 Then
+                        MessageBox.Show("No record was deleted. It may have already been removed.", "Delete", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Return
+                    End If
+                End Using
+            End Using
+
+            MessageBox.Show(currentSectionSingular & " deleted successfully.", "Delete", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            LoadDashboardOverview()
+
+            Dim sectionTitle As String = ""
+            Dim sectionSingular As String = ""
+            Dim sectionQuery As String = ""
+            GetSectionConfig(currentSectionKey, sectionTitle, sectionSingular, sectionQuery)
+            LoadSectionData(currentSectionKey, sectionQuery)
+        Catch ex As Exception
+            MessageBox.Show("Unable to delete " & currentSectionSingular.ToLowerInvariant() & ": " & ex.Message, "Delete", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
+
+    Private Function TryGetDeleteConfig(sectionKey As String, ByRef tableName As String, ByRef keyColumn As String) As Boolean
+        Select Case sectionKey.ToLowerInvariant()
+            Case "patients"
+                tableName = "patient"
+                keyColumn = "PatientID"
+            Case "consultations"
+                tableName = "consultation"
+                keyColumn = "ConsultationID"
+            Case "diagnoses"
+                tableName = "diagnosis"
+                keyColumn = "DiagnosisID"
+            Case "laborders"
+                tableName = "lab_order"
+                keyColumn = "OrderID"
+            Case "examinations"
+                tableName = "examination"
+                keyColumn = "ExaminationID"
+            Case "medicaltests"
+                tableName = "medical_test"
+                keyColumn = "TestID"
+            Case "medicines"
+                tableName = "medicine"
+                keyColumn = "MedicineID"
+            Case "prescriptions"
+                tableName = "prescription"
+                keyColumn = "PrescriptionID"
+            Case "physicians"
+                tableName = "physician"
+                keyColumn = "PhysicianID"
+            Case "medtechs"
+                tableName = "medtech"
+                keyColumn = "MedtechID"
+            Case Else
+                Return False
+        End Select
+
+        Return True
+    End Function
 
     Private Sub miConsultation_Click(sender As Object, e As EventArgs) Handles miConsultation.Click
         ShowEntitySection("consultations")
