@@ -141,7 +141,7 @@ Public Class frmDashboard
     End Sub
 
     Private Sub btnNewPrescription_Click(sender As Object, e As EventArgs) Handles btnNewPrescription.Click
-        ShowQuickActionPlaceholder("New Prescription")
+        OpenPrescriptionEntryDialog()
     End Sub
 
     Private Sub ShowQuickActionPlaceholder(actionName As String)
@@ -504,6 +504,11 @@ Public Class frmDashboard
             Return
         End If
 
+        If sectionName = "prescriptions" OrElse singular = "prescription" Then
+            OpenPrescriptionEntryDialog()
+            Return
+        End If
+
         ShowQuickActionPlaceholder("Add New " & currentSectionSingular)
     End Sub
 
@@ -550,6 +555,22 @@ Public Class frmDashboard
                     Dim sectionQuery As String = ""
                     GetSectionConfig("medtechs", sectionTitle, sectionSingular, sectionQuery)
                     LoadSectionData("medtechs", sectionQuery)
+                End If
+            End If
+        End Using
+    End Sub
+
+    Private Sub OpenPrescriptionEntryDialog()
+        Using prescriptionEntry As New frmPrescriptionEntry(MyConnectionString)
+            If prescriptionEntry.ShowDialog(Me) = DialogResult.OK Then
+                LoadDashboardOverview()
+
+                If pnlPatientsSection IsNot Nothing AndAlso pnlPatientsSection.Visible Then
+                    Dim sectionTitle As String = ""
+                    Dim sectionSingular As String = ""
+                    Dim sectionQuery As String = ""
+                    GetSectionConfig("prescriptions", sectionTitle, sectionSingular, sectionQuery)
+                    LoadSectionData("prescriptions", sectionQuery)
                 End If
             End If
         End Using
