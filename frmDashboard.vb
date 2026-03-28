@@ -509,6 +509,11 @@ Public Class frmDashboard
             Return
         End If
 
+        If sectionName = "medicines" OrElse singular = "medicine" Then
+            OpenMedicineEntryDialog()
+            Return
+        End If
+
         ShowQuickActionPlaceholder("Add New " & currentSectionSingular)
     End Sub
 
@@ -559,6 +564,22 @@ Public Class frmDashboard
                     Dim sectionQuery As String = ""
                     GetSectionConfig("prescriptions", sectionTitle, sectionSingular, sectionQuery)
                     LoadSectionData("prescriptions", sectionQuery)
+                End If
+            End If
+        End Using
+    End Sub
+
+    Private Sub OpenMedicineEntryDialog()
+        Using medicineEntry As New frmMedicineEntry(MyConnectionString)
+            If medicineEntry.ShowDialog(Me) = DialogResult.OK Then
+                LoadDashboardOverview()
+
+                If pnlPatientsSection IsNot Nothing AndAlso pnlPatientsSection.Visible Then
+                    Dim sectionTitle As String = ""
+                    Dim sectionSingular As String = ""
+                    Dim sectionQuery As String = ""
+                    GetSectionConfig("medicines", sectionTitle, sectionSingular, sectionQuery)
+                    LoadSectionData("medicines", sectionQuery)
                 End If
             End If
         End Using
