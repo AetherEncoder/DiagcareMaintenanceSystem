@@ -21,10 +21,10 @@ Partial Class frmLabOrderEntry
     Private Sub InitializeComponent()
         Me.lblOrderID = New System.Windows.Forms.Label()
         Me.txtOrderID = New System.Windows.Forms.TextBox()
-        Me.lblPhysicianID = New System.Windows.Forms.Label()
-        Me.txtPhysicianID = New System.Windows.Forms.TextBox()
-        Me.lblPatientID = New System.Windows.Forms.Label()
-        Me.txtPatientID = New System.Windows.Forms.TextBox()
+        Me.lblPhysician = New System.Windows.Forms.Label()
+        Me.cboPhysician = New System.Windows.Forms.ComboBox()
+        Me.lblPatient = New System.Windows.Forms.Label()
+        Me.cboPatient = New System.Windows.Forms.ComboBox()
         Me.lblOrderDate = New System.Windows.Forms.Label()
         Me.dtpOrderDate = New System.Windows.Forms.DateTimePicker()
         Me.btnSave = New System.Windows.Forms.Button()
@@ -48,35 +48,43 @@ Partial Class frmLabOrderEntry
         Me.txtOrderID.TabIndex = 1
         Me.txtOrderID.TabStop = False
         '
-        'lblPhysicianID
+        'lblPhysician
         '
-        Me.lblPhysicianID.Location = New System.Drawing.Point(20, 62)
-        Me.lblPhysicianID.Name = "lblPhysicianID"
-        Me.lblPhysicianID.Size = New System.Drawing.Size(130, 24)
-        Me.lblPhysicianID.TabIndex = 2
-        Me.lblPhysicianID.Text = "Physician ID *:"
+        Me.lblPhysician.Location = New System.Drawing.Point(20, 62)
+        Me.lblPhysician.Name = "lblPhysician"
+        Me.lblPhysician.Size = New System.Drawing.Size(130, 24)
+        Me.lblPhysician.TabIndex = 2
+        Me.lblPhysician.Text = "Physician *:"
         '
-        'txtPhysicianID
+        'cboPhysician
         '
-        Me.txtPhysicianID.Location = New System.Drawing.Point(160, 58)
-        Me.txtPhysicianID.Name = "txtPhysicianID"
-        Me.txtPhysicianID.Size = New System.Drawing.Size(330, 20)
-        Me.txtPhysicianID.TabIndex = 3
+        Me.cboPhysician.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
+        Me.cboPhysician.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
+        Me.cboPhysician.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
+        Me.cboPhysician.FormattingEnabled = True
+        Me.cboPhysician.Location = New System.Drawing.Point(160, 58)
+        Me.cboPhysician.Name = "cboPhysician"
+        Me.cboPhysician.Size = New System.Drawing.Size(330, 21)
+        Me.cboPhysician.TabIndex = 3
         '
-        'lblPatientID
+        'lblPatient
         '
-        Me.lblPatientID.Location = New System.Drawing.Point(20, 100)
-        Me.lblPatientID.Name = "lblPatientID"
-        Me.lblPatientID.Size = New System.Drawing.Size(130, 24)
-        Me.lblPatientID.TabIndex = 4
-        Me.lblPatientID.Text = "Patient ID *:"
+        Me.lblPatient.Location = New System.Drawing.Point(20, 100)
+        Me.lblPatient.Name = "lblPatient"
+        Me.lblPatient.Size = New System.Drawing.Size(130, 24)
+        Me.lblPatient.TabIndex = 4
+        Me.lblPatient.Text = "Patient *:"
         '
-        'txtPatientID
+        'cboPatient
         '
-        Me.txtPatientID.Location = New System.Drawing.Point(160, 96)
-        Me.txtPatientID.Name = "txtPatientID"
-        Me.txtPatientID.Size = New System.Drawing.Size(330, 20)
-        Me.txtPatientID.TabIndex = 5
+        Me.cboPatient.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
+        Me.cboPatient.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
+        Me.cboPatient.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
+        Me.cboPatient.FormattingEnabled = True
+        Me.cboPatient.Location = New System.Drawing.Point(160, 96)
+        Me.cboPatient.Name = "cboPatient"
+        Me.cboPatient.Size = New System.Drawing.Size(330, 21)
+        Me.cboPatient.TabIndex = 5
         '
         'lblOrderDate
         '
@@ -123,10 +131,10 @@ Partial Class frmLabOrderEntry
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.dtpOrderDate)
         Me.Controls.Add(Me.lblOrderDate)
-        Me.Controls.Add(Me.txtPatientID)
-        Me.Controls.Add(Me.lblPatientID)
-        Me.Controls.Add(Me.txtPhysicianID)
-        Me.Controls.Add(Me.lblPhysicianID)
+        Me.Controls.Add(Me.cboPatient)
+        Me.Controls.Add(Me.lblPatient)
+        Me.Controls.Add(Me.cboPhysician)
+        Me.Controls.Add(Me.lblPhysician)
         Me.Controls.Add(Me.txtOrderID)
         Me.Controls.Add(Me.lblOrderID)
         Me.Name = "frmLabOrderEntry"
@@ -139,10 +147,10 @@ Partial Class frmLabOrderEntry
 
     Friend WithEvents lblOrderID As Label
     Friend WithEvents txtOrderID As TextBox
-    Friend WithEvents lblPhysicianID As Label
-    Friend WithEvents txtPhysicianID As TextBox
-    Friend WithEvents lblPatientID As Label
-    Friend WithEvents txtPatientID As TextBox
+    Friend WithEvents lblPhysician As Label
+    Friend WithEvents cboPhysician As ComboBox
+    Friend WithEvents lblPatient As Label
+    Friend WithEvents cboPatient As ComboBox
     Friend WithEvents lblOrderDate As Label
     Friend WithEvents dtpOrderDate As DateTimePicker
     Friend WithEvents btnSave As Button

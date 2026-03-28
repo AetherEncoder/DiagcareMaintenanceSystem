@@ -14,6 +14,7 @@ Partial Class frmLabOrderEntry
 
     Private Sub frmLabOrderEntry_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         LoadNextOrderId()
+        LoadPhysicianAndPatientOptions()
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
@@ -27,25 +28,14 @@ Partial Class frmLabOrderEntry
         End If
 
         Dim orderId As Integer
-        Dim physicianId As Integer
-        Dim patientId As Integer
 
         If Not Integer.TryParse(txtOrderID.Text.Trim(), orderId) Then
             MessageBox.Show("Invalid Order ID.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
 
-        If Not Integer.TryParse(txtPhysicianID.Text.Trim(), physicianId) Then
-            MessageBox.Show("Physician ID must be numeric.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            txtPhysicianID.Focus()
-            Return
-        End If
-
-        If Not Integer.TryParse(txtPatientID.Text.Trim(), patientId) Then
-            MessageBox.Show("Patient ID must be numeric.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            txtPatientID.Focus()
-            Return
-        End If
+        Dim physicianId As Integer = Convert.ToInt32(cboPhysician.SelectedValue)
+        Dim patientId As Integer = Convert.ToInt32(cboPatient.SelectedValue)
 
         Try
             Using conn As New MySqlConnection(_connectionString)
@@ -81,20 +71,64 @@ Partial Class frmLabOrderEntry
             Return False
         End If
 
-        If String.IsNullOrWhiteSpace(txtPhysicianID.Text) Then
-            MessageBox.Show("Physician ID is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            txtPhysicianID.Focus()
+        If cboPhysician.SelectedIndex < 0 OrElse cboPhysician.SelectedValue Is Nothing OrElse TypeOf cboPhysician.SelectedValue Is DataRowView Then
+            MessageBox.Show("Physician is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            cboPhysician.Focus()
             Return False
         End If
 
-        If String.IsNullOrWhiteSpace(txtPatientID.Text) Then
-            MessageBox.Show("Patient ID is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            txtPatientID.Focus()
+        If cboPatient.SelectedIndex < 0 OrElse cboPatient.SelectedValue Is Nothing OrElse TypeOf cboPatient.SelectedValue Is DataRowView Then
+            MessageBox.Show("Patient is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            cboPatient.Focus()
             Return False
         End If
 
         Return True
     End Function
+
+    Private Sub LoadPhysicianAndPatientOptions()
+        If String.IsNullOrWhiteSpace(_connectionString) Then
+            cboPhysician.DataSource = Nothing
+            cboPatient.DataSource = Nothing
+            Return
+        End If
+
+        Try
+            Using conn As New MySqlConnection(_connectionString)
+                conn.Open()
+
+                Dim physicianTable As New DataTable()
+                Dim physicianSql As String = "SELECT PhysicianID, CONCAT(FirstName, ' ', LastName, ' (', PhysicianID, ')') AS FullName FROM physician ORDER BY FirstName, LastName"
+                Using physicianCmd As New MySqlCommand(physicianSql, conn)
+                    Using physicianAdapter As New MySqlDataAdapter(physicianCmd)
+                        physicianAdapter.Fill(physicianTable)
+                    End Using
+                End Using
+
+                cboPhysician.DataSource = physicianTable
+                cboPhysician.DisplayMember = "FullName"
+                cboPhysician.ValueMember = "PhysicianID"
+                cboPhysician.SelectedIndex = -1
+
+                Dim patientTable As New DataTable()
+                Dim patientSql As String = "SELECT PatientID, CONCAT(FirstName, ' ', LastName, ' (', PatientID, ')') AS FullName FROM patient ORDER BY FirstName, LastName"
+                Using patientCmd As New MySqlCommand(patientSql, conn)
+                    Using patientAdapter As New MySqlDataAdapter(patientCmd)
+                        patientAdapter.Fill(patientTable)
+                    End Using
+                End Using
+
+                cboPatient.DataSource = patientTable
+                cboPatient.DisplayMember = "FullName"
+                cboPatient.ValueMember = "PatientID"
+                cboPatient.SelectedIndex = -1
+            End Using
+        Catch ex As Exception
+            cboPhysician.DataSource = Nothing
+            cboPatient.DataSource = Nothing
+            MessageBox.Show("Unable to load patient and physician names: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
 
     Private Sub LoadNextOrderId()
         If String.IsNullOrWhiteSpace(_connectionString) Then
