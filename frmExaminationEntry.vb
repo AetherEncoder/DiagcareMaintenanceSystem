@@ -1,0 +1,293 @@
+﻿Imports MySql.Data.MySqlClient
+
+Public Class frmExaminationEntry
+    Private ReadOnly _connectionString As String
+    Private ReadOnly _selectedLabTests As New List(Of LabTestSelectionItem)()
+
+    Private Class LabTestSelectionItem
+        Public Property TestID As Integer
+        Public Property DisplayName As String
+
+        Public Overrides Function ToString() As String
+            Return DisplayName
+        End Function
+    End Class
+
+    Public Sub New()
+        InitializeComponent()
+    End Sub
+
+    Public Sub New(connectionString As String)
+        _connectionString = connectionString
+        InitializeComponent()
+    End Sub
+
+    Private Sub frmExaminationEntry_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        LoadNextExaminationId()
+        LoadPatientOptions()
+        LoadLabTestOptions()
+        RefreshSelectedLabTestsList()
+    End Sub
+
+    Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
+        Me.DialogResult = DialogResult.Cancel
+        Me.Close()
+    End Sub
+
+    Private Sub btnAddLabTest_Click(sender As Object, e As EventArgs) Handles btnAddLabTest.Click
+        If cboLabTest.SelectedIndex < 0 OrElse cboLabTest.SelectedValue Is Nothing OrElse TypeOf cboLabTest.SelectedValue Is DataRowView Then
+            MessageBox.Show("Select a laboratory test to add.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            cboLabTest.Focus()
+            Return
+        End If
+
+        Dim testId As Integer = Convert.ToInt32(cboLabTest.SelectedValue)
+        If IsLabTestAlreadySelected(testId) Then
+            MessageBox.Show("Laboratory test is already added.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+
+        _selectedLabTests.Add(New LabTestSelectionItem With {
+            .TestID = testId,
+            .DisplayName = cboLabTest.Text.Trim()
+        })
+
+        RefreshSelectedLabTestsList()
+        cboLabTest.SelectedIndex = -1
+        cboLabTest.Focus()
+    End Sub
+
+    Private Sub btnRemoveLabTest_Click(sender As Object, e As EventArgs) Handles btnRemoveLabTest.Click
+        If lstSelectedLabTests.SelectedItem Is Nothing Then
+            MessageBox.Show("Select a laboratory test from the list to remove.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            lstSelectedLabTests.Focus()
+            Return
+        End If
+
+        Dim selectedItem As LabTestSelectionItem = TryCast(lstSelectedLabTests.SelectedItem, LabTestSelectionItem)
+        If selectedItem Is Nothing Then Return
+
+        For i As Integer = _selectedLabTests.Count - 1 To 0 Step -1
+            If _selectedLabTests(i).TestID = selectedItem.TestID Then
+                _selectedLabTests.RemoveAt(i)
+                Exit For
+            End If
+        Next
+
+        RefreshSelectedLabTestsList()
+    End Sub
+
+    Private Function IsLabTestAlreadySelected(testId As Integer) As Boolean
+        For Each item As LabTestSelectionItem In _selectedLabTests
+            If item.TestID = testId Then
+                Return True
+            End If
+        Next
+
+        Return False
+    End Function
+
+    Private Sub RefreshSelectedLabTestsList()
+        lstSelectedLabTests.Items.Clear()
+
+        For Each item As LabTestSelectionItem In _selectedLabTests
+            lstSelectedLabTests.Items.Add(item)
+        Next
+    End Sub
+
+    Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
+        If Not ValidateInputs() Then
+            Return
+        End If
+
+        Dim examinationId As Integer
+        If Not Integer.TryParse(txtExaminationID.Text.Trim(), examinationId) Then
+            MessageBox.Show("Invalid Examination ID.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        Dim patientId As Integer = Convert.ToInt32(cboPatient.SelectedValue)
+
+        Try
+            Using conn As New MySqlConnection(_connectionString)
+                conn.Open()
+
+                Dim examSql As String = "INSERT INTO examination (ExaminationID, PatientID, Result, DatePerformed) VALUES (@ExaminationID, @PatientID, @Result, @DatePerformed)"
+                Using examCmd As New MySqlCommand(examSql, conn)
+                    examCmd.Parameters.AddWithValue("@ExaminationID", examinationId)
+                    examCmd.Parameters.AddWithValue("@PatientID", patientId)
+                    examCmd.Parameters.AddWithValue("@Result", txtResult.Text.Trim())
+                    examCmd.Parameters.AddWithValue("@DatePerformed", dtpDatePerformed.Value.Date)
+                    examCmd.ExecuteNonQuery()
+                End Using
+
+                Dim inclusionSql As String = "INSERT INTO exam_inclusion (TestID, ExaminationID) VALUES (@TestID, @ExaminationID)"
+                For Each labTest As LabTestSelectionItem In _selectedLabTests
+                    Using inclusionCmd As New MySqlCommand(inclusionSql, conn)
+                        inclusionCmd.Parameters.AddWithValue("@TestID", labTest.TestID)
+                        inclusionCmd.Parameters.AddWithValue("@ExaminationID", examinationId)
+                        inclusionCmd.ExecuteNonQuery()
+                    End Using
+                Next
+            End Using
+
+            MessageBox.Show("Examination added successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Me.DialogResult = DialogResult.OK
+            Me.Close()
+        Catch ex As Exception
+            MessageBox.Show("Unable to save examination: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Function ValidateInputs() As Boolean
+        If String.IsNullOrWhiteSpace(_connectionString) Then
+            MessageBox.Show("Connection string is not set.", "Configuration", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return False
+        End If
+
+        If String.IsNullOrWhiteSpace(txtExaminationID.Text) Then
+            MessageBox.Show("Examination ID is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return False
+        End If
+
+        If cboPatient.SelectedIndex < 0 OrElse cboPatient.SelectedValue Is Nothing OrElse TypeOf cboPatient.SelectedValue Is DataRowView Then
+            MessageBox.Show("Patient is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            cboPatient.Focus()
+            Return False
+        End If
+
+        If String.IsNullOrWhiteSpace(txtResult.Text) Then
+            MessageBox.Show("Result is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            txtResult.Focus()
+            Return False
+        End If
+
+        If _selectedLabTests.Count = 0 Then
+            MessageBox.Show("Add at least one laboratory test.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            cboLabTest.Focus()
+            Return False
+        End If
+
+        Return True
+    End Function
+
+    Private Sub LoadPatientOptions()
+        If String.IsNullOrWhiteSpace(_connectionString) Then
+            cboPatient.DataSource = Nothing
+            Return
+        End If
+
+        Try
+            Using conn As New MySqlConnection(_connectionString)
+                conn.Open()
+
+                Dim patientTable As New DataTable()
+                Dim patientSql As String = "SELECT PatientID, CONCAT(FirstName, ' ', LastName, ' (', PatientID, ')') AS FullName FROM patient ORDER BY FirstName, LastName"
+                Using cmd As New MySqlCommand(patientSql, conn)
+                    Using adapter As New MySqlDataAdapter(cmd)
+                        adapter.Fill(patientTable)
+                    End Using
+                End Using
+
+                cboPatient.DataSource = patientTable
+                cboPatient.DisplayMember = "FullName"
+                cboPatient.ValueMember = "PatientID"
+                cboPatient.SelectedIndex = -1
+            End Using
+        Catch ex As Exception
+            cboPatient.DataSource = Nothing
+            MessageBox.Show("Unable to load patients: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub LoadLabTestOptions()
+        If String.IsNullOrWhiteSpace(_connectionString) Then
+            cboLabTest.DataSource = Nothing
+            Return
+        End If
+
+        Try
+            Using conn As New MySqlConnection(_connectionString)
+                conn.Open()
+
+                Dim labTestTable As New DataTable()
+                Dim labTestSql As String = "SELECT TestID, CONCAT(TestName, ' (', TestID, ')') AS FullName FROM medical_test ORDER BY TestName"
+                Using cmd As New MySqlCommand(labTestSql, conn)
+                    Using adapter As New MySqlDataAdapter(cmd)
+                        adapter.Fill(labTestTable)
+                    End Using
+                End Using
+
+                cboLabTest.DataSource = labTestTable
+                cboLabTest.DisplayMember = "FullName"
+                cboLabTest.ValueMember = "TestID"
+                cboLabTest.SelectedIndex = -1
+            End Using
+        Catch ex As Exception
+            cboLabTest.DataSource = Nothing
+            MessageBox.Show("Unable to load laboratory tests: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub LoadNextExaminationId()
+        If String.IsNullOrWhiteSpace(_connectionString) Then
+            txtExaminationID.Text = ""
+            Return
+        End If
+
+        Try
+            Using conn As New MySqlConnection(_connectionString)
+                conn.Open()
+
+                Dim newExaminationId As Integer = GetNextAvailableExaminationId(conn)
+                If newExaminationId = -1 Then
+                    txtExaminationID.Text = ""
+                    MessageBox.Show("No available ExaminationID in range 80001 to 89999.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                    Return
+                End If
+
+                txtExaminationID.Text = newExaminationId.ToString()
+            End Using
+        Catch ex As Exception
+            txtExaminationID.Text = ""
+            MessageBox.Show("Unable to generate examination ID: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Function GetNextAvailableExaminationId(conn As MySqlConnection) As Integer
+        Const minId As Integer = 80001
+        Const maxId As Integer = 89999
+
+        Dim candidate As Integer = minId
+        Dim sql As String = "SELECT ExaminationID FROM examination WHERE ExaminationID BETWEEN @minId AND @maxId ORDER BY ExaminationID"
+
+        Using cmd As New MySqlCommand(sql, conn)
+            cmd.Parameters.AddWithValue("@minId", minId)
+            cmd.Parameters.AddWithValue("@maxId", maxId)
+
+            Using reader As MySqlDataReader = cmd.ExecuteReader()
+                While reader.Read()
+                    Dim usedId As Integer = Convert.ToInt32(reader("ExaminationID"))
+                    If usedId < candidate Then
+                        Continue While
+                    End If
+
+                    If usedId = candidate Then
+                        candidate += 1
+                        If candidate > maxId Then
+                            Return -1
+                        End If
+                    ElseIf usedId > candidate Then
+                        Exit While
+                    End If
+                End While
+            End Using
+        End Using
+
+        If candidate > maxId Then
+            Return -1
+        End If
+
+        Return candidate
+    End Function
+End Class
