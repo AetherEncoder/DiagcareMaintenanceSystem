@@ -745,7 +745,47 @@ Public Class frmDashboard
     End Sub
 
     Private Sub BtnUpdatePatient_Click(sender As Object, e As EventArgs)
-        ShowQuickActionPlaceholder("Update " & currentSectionSingular)
+        If currentSectionKey <> "patients" Then
+            ShowQuickActionPlaceholder("Update " & currentSectionSingular)
+            Return
+        End If
+
+        If dgvPatients Is Nothing OrElse dgvPatients.SelectedRows.Count = 0 Then
+            MessageBox.Show("Select a patient row to update.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        If Not dgvPatients.Columns.Contains("PatientID") Then
+            MessageBox.Show("Unable to resolve selected patient ID.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        Dim selectedRow As DataGridViewRow = dgvPatients.SelectedRows(0)
+        Dim idValue As Object = selectedRow.Cells("PatientID").Value
+        If idValue Is Nothing OrElse idValue Is DBNull.Value Then
+            MessageBox.Show("Unable to resolve selected patient ID.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        Dim patientId As Integer
+        If Not Integer.TryParse(idValue.ToString(), patientId) Then
+            MessageBox.Show("Invalid selected patient ID.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        Using patientEntry As New frmPatientEntry(MyConnectionString, patientId)
+            If patientEntry.ShowDialog(Me) = DialogResult.OK Then
+                LoadDashboardOverview()
+
+                If pnlPatientsSection IsNot Nothing AndAlso pnlPatientsSection.Visible Then
+                    Dim sectionTitle As String = ""
+                    Dim sectionSingular As String = ""
+                    Dim sectionQuery As String = ""
+                    GetSectionConfig("patients", sectionTitle, sectionSingular, sectionQuery)
+                    LoadSectionData("patients", sectionQuery)
+                End If
+            End If
+        End Using
     End Sub
 
     Private Sub BtnDeletePatient_Click(sender As Object, e As EventArgs)

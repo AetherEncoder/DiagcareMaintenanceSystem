@@ -3,6 +3,8 @@ Imports System.Text.RegularExpressions
 
 Public Class frmPatientEntry
     Private ReadOnly _connectionString As String
+    Private ReadOnly _isUpdateMode As Boolean
+    Private ReadOnly _existingPatientId As Integer
 
     Public Sub New()
         InitializeComponent()
@@ -13,12 +15,27 @@ Public Class frmPatientEntry
         InitializeComponent()
     End Sub
 
+    Public Sub New(connectionString As String, patientId As Integer)
+        _connectionString = connectionString
+        _isUpdateMode = True
+        _existingPatientId = patientId
+        InitializeComponent()
+    End Sub
+
     Private Sub frmPatientEntry_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If cboSex.Items.Count > 0 AndAlso cboSex.SelectedIndex < 0 Then
             cboSex.SelectedIndex = 0
         End If
 
-        LoadNextPatientId()
+        If _isUpdateMode Then
+            Me.Text = "Update Patient"
+            btnSave.Text = "Update"
+            LoadPatientForUpdate()
+        Else
+            Me.Text = "Add New Patient"
+            btnSave.Text = "Save"
+            LoadNextPatientId()
+        End If
     End Sub
 
     Private Sub txtPhoneNumber_Leave(sender As Object, e As EventArgs) Handles txtPhoneNumber.Leave
@@ -47,8 +64,15 @@ Public Class frmPatientEntry
             Using conn As New MySqlConnection(_connectionString)
                 conn.Open()
 
-                Dim sql As String = "INSERT INTO patient (PatientID, FirstName, LastName, Sex, DateOfBirth, PhoneNumber, HouseNumber, Street, City, Province) " &
-                                    "VALUES (@PatientID, @FirstName, @LastName, @Sex, @DateOfBirth, @PhoneNumber, @HouseNumber, @Street, @City, @Province)"
+                Dim sql As String
+                If _isUpdateMode Then
+                    sql = "UPDATE patient SET FirstName = @FirstName, LastName = @LastName, Sex = @Sex, DateOfBirth = @DateOfBirth, " &
+                          "PhoneNumber = @PhoneNumber, HouseNumber = @HouseNumber, Street = @Street, City = @City, Province = @Province " &
+                          "WHERE PatientID = @PatientID"
+                Else
+                    sql = "INSERT INTO patient (PatientID, FirstName, LastName, Sex, DateOfBirth, PhoneNumber, HouseNumber, Street, City, Province) " &
+                          "VALUES (@PatientID, @FirstName, @LastName, @Sex, @DateOfBirth, @PhoneNumber, @HouseNumber, @Street, @City, @Province)"
+                End If
 
                 Using cmd As New MySqlCommand(sql, conn)
                     cmd.Parameters.AddWithValue("@PatientID", patientId)
@@ -65,11 +89,71 @@ Public Class frmPatientEntry
                 End Using
             End Using
 
-            MessageBox.Show("Patient added successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            If _isUpdateMode Then
+                MessageBox.Show("Patient updated successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Else
+                MessageBox.Show("Patient added successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End If
+
             Me.DialogResult = DialogResult.OK
             Me.Close()
         Catch ex As Exception
             MessageBox.Show("Unable to save patient: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub LoadPatientForUpdate()
+        If String.IsNullOrWhiteSpace(_connectionString) OrElse _existingPatientId <= 0 Then
+            MessageBox.Show("Unable to load selected patient.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Me.DialogResult = DialogResult.Cancel
+            Me.Close()
+            Return
+        End If
+
+        Try
+            Using conn As New MySqlConnection(_connectionString)
+                conn.Open()
+
+                Dim sql As String = "SELECT PatientID, FirstName, LastName, Sex, DateOfBirth, PhoneNumber, HouseNumber, Street, City, Province " &
+                                    "FROM patient WHERE PatientID = @PatientID"
+                Using cmd As New MySqlCommand(sql, conn)
+                    cmd.Parameters.AddWithValue("@PatientID", _existingPatientId)
+
+                    Using reader As MySqlDataReader = cmd.ExecuteReader()
+                        If Not reader.Read() Then
+                            MessageBox.Show("Selected patient was not found.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            Me.DialogResult = DialogResult.Cancel
+                            Me.Close()
+                            Return
+                        End If
+
+                        txtPatientID.Text = Convert.ToInt32(reader("PatientID")).ToString()
+                        txtFirstName.Text = reader("FirstName").ToString()
+                        txtLastName.Text = reader("LastName").ToString()
+
+                        Dim sexValue As String = reader("Sex").ToString()
+                        If cboSex.Items.Contains(sexValue) Then
+                            cboSex.SelectedItem = sexValue
+                        ElseIf cboSex.Items.Count > 0 Then
+                            cboSex.SelectedIndex = 0
+                        End If
+
+                        If Not Convert.IsDBNull(reader("DateOfBirth")) Then
+                            dtpDateOfBirth.Value = Convert.ToDateTime(reader("DateOfBirth"))
+                        End If
+
+                        txtPhoneNumber.Text = reader("PhoneNumber").ToString()
+                        txtHouseNumber.Text = reader("HouseNumber").ToString()
+                        txtStreet.Text = reader("Street").ToString()
+                        txtCity.Text = reader("City").ToString()
+                        txtProvince.Text = reader("Province").ToString()
+                    End Using
+                End Using
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("Unable to load selected patient: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Me.DialogResult = DialogResult.Cancel
+            Me.Close()
         End Try
     End Sub
 
