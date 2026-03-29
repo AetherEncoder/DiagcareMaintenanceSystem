@@ -217,7 +217,7 @@ Partial Class frmExaminationEntry
         '
         'btnSave
         '
-        Me.btnSave.BackColor = System.Drawing.Color.DarkBlue
+        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
         Me.btnSave.ForeColor = System.Drawing.Color.White
         Me.btnSave.Location = New System.Drawing.Point(300, 523)
         Me.btnSave.Name = "btnSave"

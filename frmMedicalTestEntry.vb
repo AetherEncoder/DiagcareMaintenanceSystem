@@ -25,10 +25,12 @@ Public Class frmMedicalTestEntry
         If _isUpdateMode Then
             Me.Text = "Update Medical Test"
             btnSave.Text = "Update"
+            btnSave.BackColor = Color.FromArgb(217, 92, 128)
             LoadMedicalTestForUpdate()
         Else
             Me.Text = "Add New Medical Test"
             btnSave.Text = "Save"
+            btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextTestId()
         End If
     End Sub

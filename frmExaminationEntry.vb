@@ -51,10 +51,12 @@ Public Class frmExaminationEntry
         If _isUpdateMode Then
             Me.Text = "Update Examination"
             btnSave.Text = "Update"
+            btnSave.BackColor = Color.FromArgb(217, 92, 128)
             LoadExaminationForUpdate()
         Else
             Me.Text = "Add New Examination"
             btnSave.Text = "Save"
+            btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextExaminationId()
         End If
     End Sub

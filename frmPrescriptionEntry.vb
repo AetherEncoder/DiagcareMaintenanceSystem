@@ -39,10 +39,12 @@ Partial Class frmPrescriptionEntry
         If _isUpdateMode Then
             Me.Text = "Update Prescription"
             btnSave.Text = "Update"
+            btnSave.BackColor = Color.FromArgb(217, 92, 128)
             LoadPrescriptionForUpdate()
         Else
             Me.Text = "Add New Prescription"
             btnSave.Text = "Save"
+            btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextPrescriptionId()
         End If
     End Sub

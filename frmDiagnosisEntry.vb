@@ -27,10 +27,12 @@ Public Class frmDiagnosisEntry
         If _isUpdateMode Then
             Me.Text = "Update Diagnosis"
             btnSave.Text = "Update"
+            btnSave.BackColor = Color.FromArgb(217, 92, 128)
             LoadDiagnosisForUpdate()
         Else
             Me.Text = "Add New Diagnosis"
             btnSave.Text = "Save"
+            btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextDiagnosisId()
         End If
     End Sub

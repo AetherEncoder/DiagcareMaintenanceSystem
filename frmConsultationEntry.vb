@@ -27,10 +27,12 @@ Public Class frmConsultationEntry
         If _isUpdateMode Then
             Me.Text = "Update Consultation"
             btnSave.Text = "Update"
+            btnSave.BackColor = Color.FromArgb(217, 92, 128)
             LoadConsultationForUpdate()
         Else
             Me.Text = "Add New Consultation"
             btnSave.Text = "Save"
+            btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextConsultationId()
         End If
     End Sub

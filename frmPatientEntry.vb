@@ -30,10 +30,12 @@ Public Class frmPatientEntry
         If _isUpdateMode Then
             Me.Text = "Update Patient"
             btnSave.Text = "Update"
+            btnSave.BackColor = Color.FromArgb(217, 92, 128)
             LoadPatientForUpdate()
         Else
             Me.Text = "Add New Patient"
             btnSave.Text = "Save"
+            btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextPatientId()
         End If
     End Sub
@@ -317,7 +319,7 @@ Public Class frmPatientEntry
                     If usedId = candidate Then
                         candidate += 1
                         If candidate > maxId Then
-                            Return -1
+                          Return -1
                         End If
                     ElseIf usedId > candidate Then
                         Exit While
