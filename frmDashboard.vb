@@ -22,6 +22,7 @@ Public Class frmDashboard
 
     'We will use this later in the update and delete modules
     Dim row As Integer
+    Private currentLoggedInUsername As String = ""
     Private currentSectionName As String = "Patients"
     Private currentSectionSingular As String = "Patient"
     Private currentSectionKey As String = "patients"
@@ -113,6 +114,7 @@ Public Class frmDashboard
                 Dim reader As MySqlDataReader = cmd.ExecuteReader()
 
                 If reader.HasRows Then
+                    currentLoggedInUsername = txtUsername.Text.Trim()
                     reader.Close()
                     ShowDashboard()
                 Else
@@ -184,6 +186,7 @@ Public Class frmDashboard
         pnlDashboard.Visible = False
         pnlLoginContainer.Visible = True
 
+        currentLoggedInUsername = ""
         txtUsername.Text = ""
         txtPassword.Text = ""
         ClearErrorMessages()
@@ -1327,6 +1330,266 @@ Public Class frmDashboard
     Private Sub miReports_Click(sender As Object, e As EventArgs) Handles miReports.Click
         ShowReportsSection()
     End Sub
+
+    Private Sub miAccountSettings_Click(sender As Object, e As EventArgs) Handles miAccountSettings.Click
+        ShowAccountSettingsDialog()
+    End Sub
+
+    Private Sub ShowAccountSettingsDialog()
+        If String.IsNullOrWhiteSpace(currentLoggedInUsername) Then
+            MessageBox.Show("No active account session found.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return
+        End If
+
+        Dim settingsForm As New Form()
+        settingsForm.Text = "Account Settings"
+        settingsForm.StartPosition = FormStartPosition.CenterParent
+        settingsForm.FormBorderStyle = FormBorderStyle.FixedDialog
+        settingsForm.MaximizeBox = False
+        settingsForm.MinimizeBox = False
+        settingsForm.ClientSize = New Size(520, 406)
+
+        Dim grpUsername As New GroupBox()
+        grpUsername.Text = "Update Username"
+        grpUsername.Font = New Font("Microsoft Sans Serif", 9.0!, FontStyle.Bold)
+        grpUsername.ForeColor = Color.DarkBlue
+        grpUsername.Location = New Point(16, 14)
+        grpUsername.Size = New Size(488, 104)
+
+        Dim lblUsername As New Label()
+        lblUsername.Text = "Username"
+        lblUsername.ForeColor = Color.Black
+        lblUsername.Location = New Point(16, 31)
+        lblUsername.AutoSize = True
+
+        Dim txtUsernameSetting As New TextBox()
+        txtUsernameSetting.Location = New Point(120, 28)
+        txtUsernameSetting.Size = New Size(352, 21)
+        txtUsernameSetting.Text = currentLoggedInUsername
+
+        Dim btnSaveUsername As New Button()
+        btnSaveUsername.Text = "Save Username"
+        btnSaveUsername.BackColor = Color.DarkBlue
+        btnSaveUsername.ForeColor = Color.White
+        btnSaveUsername.Location = New Point(336, 56)
+        btnSaveUsername.Size = New Size(136, 30)
+
+        AddHandler btnSaveUsername.Click,
+            Sub()
+                If UpdateCurrentUserUsername(txtUsernameSetting.Text.Trim()) Then
+                    txtUsernameSetting.Text = currentLoggedInUsername
+                End If
+            End Sub
+
+        grpUsername.Controls.Add(lblUsername)
+        grpUsername.Controls.Add(txtUsernameSetting)
+        grpUsername.Controls.Add(btnSaveUsername)
+
+        Dim grpPassword As New GroupBox()
+        grpPassword.Text = "Change Password"
+        grpPassword.Font = New Font("Microsoft Sans Serif", 9.0!, FontStyle.Bold)
+        grpPassword.ForeColor = Color.DarkBlue
+        grpPassword.Location = New Point(16, 126)
+        grpPassword.Size = New Size(488, 146)
+
+        Dim lblPassword As New Label()
+        lblPassword.Text = "New Password"
+        lblPassword.ForeColor = Color.Black
+        lblPassword.Location = New Point(16, 31)
+        lblPassword.AutoSize = True
+
+        Dim txtPasswordSetting As New TextBox()
+        txtPasswordSetting.Location = New Point(120, 28)
+        txtPasswordSetting.Size = New Size(352, 21)
+        txtPasswordSetting.UseSystemPasswordChar = True
+
+        Dim lblRetypePassword As New Label()
+        lblRetypePassword.Text = "Retype"
+        lblRetypePassword.ForeColor = Color.Black
+        lblRetypePassword.Location = New Point(16, 69)
+        lblRetypePassword.AutoSize = True
+
+        Dim txtRetypePasswordSetting As New TextBox()
+        txtRetypePasswordSetting.Location = New Point(120, 66)
+        txtRetypePasswordSetting.Size = New Size(352, 21)
+        txtRetypePasswordSetting.UseSystemPasswordChar = True
+
+        Dim btnSavePassword As New Button()
+        btnSavePassword.Text = "Save Password"
+        btnSavePassword.BackColor = Color.DarkBlue
+        btnSavePassword.ForeColor = Color.White
+        btnSavePassword.Location = New Point(336, 106)
+        btnSavePassword.Size = New Size(136, 30)
+
+        AddHandler btnSavePassword.Click,
+            Sub()
+                If UpdateCurrentUserPassword(txtPasswordSetting.Text, txtRetypePasswordSetting.Text) Then
+                    txtPasswordSetting.Text = ""
+                    txtRetypePasswordSetting.Text = ""
+                End If
+            End Sub
+
+        grpPassword.Controls.Add(lblPassword)
+        grpPassword.Controls.Add(txtPasswordSetting)
+        grpPassword.Controls.Add(lblRetypePassword)
+        grpPassword.Controls.Add(txtRetypePasswordSetting)
+        grpPassword.Controls.Add(btnSavePassword)
+
+        Dim grpDanger As New GroupBox()
+        grpDanger.Text = "Delete Account"
+        grpDanger.Font = New Font("Microsoft Sans Serif", 9.0!, FontStyle.Bold)
+        grpDanger.ForeColor = Color.Maroon
+        grpDanger.Location = New Point(16, 280)
+        grpDanger.Size = New Size(488, 76)
+
+        Dim btnDeleteAccount As New Button()
+        btnDeleteAccount.Text = "Delete Account"
+        btnDeleteAccount.BackColor = Color.Maroon
+        btnDeleteAccount.ForeColor = Color.White
+        btnDeleteAccount.Location = New Point(336, 28)
+        btnDeleteAccount.Size = New Size(136, 30)
+
+        AddHandler btnDeleteAccount.Click,
+            Sub()
+                If DeleteCurrentUserAccount() Then
+                    settingsForm.Tag = "DELETED"
+                    settingsForm.DialogResult = DialogResult.OK
+                    settingsForm.Close()
+                End If
+            End Sub
+
+        grpDanger.Controls.Add(btnDeleteAccount)
+
+        Dim btnCloseSettings As New Button()
+        btnCloseSettings.Text = "Close"
+        btnCloseSettings.Location = New Point(400, 364)
+        btnCloseSettings.Size = New Size(104, 30)
+        AddHandler btnCloseSettings.Click,
+            Sub()
+                settingsForm.DialogResult = DialogResult.Cancel
+                settingsForm.Close()
+            End Sub
+
+        settingsForm.Controls.Add(grpUsername)
+        settingsForm.Controls.Add(grpPassword)
+        settingsForm.Controls.Add(grpDanger)
+        settingsForm.Controls.Add(btnCloseSettings)
+
+        settingsForm.ShowDialog(Me)
+
+        If settingsForm.Tag IsNot Nothing AndAlso settingsForm.Tag.ToString() = "DELETED" Then
+            MessageBox.Show("Account deleted successfully.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            ShowLoginPage()
+        End If
+    End Sub
+
+    Private Function UpdateCurrentUserUsername(newUsername As String) As Boolean
+        If String.IsNullOrWhiteSpace(newUsername) Then
+            MessageBox.Show("Username is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return False
+        End If
+
+        If String.Equals(newUsername, currentLoggedInUsername, StringComparison.OrdinalIgnoreCase) Then
+            MessageBox.Show("No username changes detected.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return False
+        End If
+
+        Try
+            Using conn As New MySqlConnection(MyConnectionString)
+                conn.Open()
+
+                Using checkCmd As New MySqlCommand("SELECT COUNT(*) FROM USER WHERE username = @username", conn)
+                    checkCmd.Parameters.AddWithValue("@username", newUsername)
+                    If Convert.ToInt32(checkCmd.ExecuteScalar()) > 0 Then
+                        MessageBox.Show("Username is already taken.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Return False
+                    End If
+                End Using
+
+                Using updateCmd As New MySqlCommand("UPDATE USER SET username = @newUsername WHERE username = @currentUsername", conn)
+                    updateCmd.Parameters.AddWithValue("@newUsername", newUsername)
+                    updateCmd.Parameters.AddWithValue("@currentUsername", currentLoggedInUsername)
+
+                    If updateCmd.ExecuteNonQuery() = 0 Then
+                        MessageBox.Show("Account was not found.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Return False
+                    End If
+                End Using
+            End Using
+
+            currentLoggedInUsername = newUsername
+            MessageBox.Show("Username updated successfully.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return True
+        Catch ex As Exception
+            MessageBox.Show("Unable to update username: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return False
+        End Try
+    End Function
+
+    Private Function UpdateCurrentUserPassword(password As String, retypePassword As String) As Boolean
+        If String.IsNullOrWhiteSpace(password) Then
+            MessageBox.Show("Password is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return False
+        End If
+
+        If String.IsNullOrWhiteSpace(retypePassword) Then
+            MessageBox.Show("Retype password is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return False
+        End If
+
+        If password <> retypePassword Then
+            MessageBox.Show("Passwords do not match.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Return False
+        End If
+
+        Try
+            Using conn As New MySqlConnection(MyConnectionString)
+                conn.Open()
+
+                Using cmd As New MySqlCommand("UPDATE USER SET password = @password WHERE username = @username", conn)
+                    cmd.Parameters.AddWithValue("@password", password)
+                    cmd.Parameters.AddWithValue("@username", currentLoggedInUsername)
+
+                    If cmd.ExecuteNonQuery() = 0 Then
+                        MessageBox.Show("Account was not found.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Return False
+                    End If
+                End Using
+            End Using
+
+            MessageBox.Show("Password updated successfully.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return True
+        Catch ex As Exception
+            MessageBox.Show("Unable to update password: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return False
+        End Try
+    End Function
+
+    Private Function DeleteCurrentUserAccount() As Boolean
+        Dim confirm As DialogResult = MessageBox.Show("This will permanently delete your account. Continue?", "Delete Account", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
+        If confirm <> DialogResult.Yes Then
+            Return False
+        End If
+
+        Try
+            Using conn As New MySqlConnection(MyConnectionString)
+                conn.Open()
+
+                Using cmd As New MySqlCommand("DELETE FROM USER WHERE username = @username", conn)
+                    cmd.Parameters.AddWithValue("@username", currentLoggedInUsername)
+                    If cmd.ExecuteNonQuery() = 0 Then
+                        MessageBox.Show("Account was not found.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Return False
+                    End If
+                End Using
+            End Using
+
+            Return True
+        Catch ex As Exception
+            MessageBox.Show("Unable to delete account: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return False
+        End Try
+    End Function
 
     Private Sub ApplyGridWrapping(parent As Control)
         For Each ctrl As Control In parent.Controls
