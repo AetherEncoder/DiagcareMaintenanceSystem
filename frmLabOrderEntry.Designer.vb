@@ -19,6 +19,7 @@ Partial Class frmLabOrderEntry
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmLabOrderEntry))
         Me.lblOrderID = New System.Windows.Forms.Label()
         Me.txtOrderID = New System.Windows.Forms.TextBox()
         Me.lblPhysician = New System.Windows.Forms.Label()
@@ -66,7 +67,6 @@ Partial Class frmLabOrderEntry
         '
         Me.cboPhysician.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cboPhysician.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.cboPhysician.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cboPhysician.FormattingEnabled = True
         Me.cboPhysician.Location = New System.Drawing.Point(160, 58)
         Me.cboPhysician.Name = "cboPhysician"
@@ -85,7 +85,6 @@ Partial Class frmLabOrderEntry
         '
         Me.cboPatient.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cboPatient.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.cboPatient.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cboPatient.FormattingEnabled = True
         Me.cboPatient.Location = New System.Drawing.Point(160, 96)
         Me.cboPatient.Name = "cboPatient"
@@ -120,7 +119,6 @@ Partial Class frmLabOrderEntry
         '
         Me.cboMedicalTest.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cboMedicalTest.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.cboMedicalTest.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cboMedicalTest.FormattingEnabled = True
         Me.cboMedicalTest.Location = New System.Drawing.Point(160, 168)
         Me.cboMedicalTest.Name = "cboMedicalTest"
@@ -163,7 +161,7 @@ Partial Class frmLabOrderEntry
         '
         'btnSave
         '
-        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnSave.ForeColor = System.Drawing.Color.White
         Me.btnSave.Location = New System.Drawing.Point(300, 314)
         Me.btnSave.Name = "btnSave"
@@ -202,6 +200,7 @@ Partial Class frmLabOrderEntry
         Me.Controls.Add(Me.lblPhysician)
         Me.Controls.Add(Me.txtOrderID)
         Me.Controls.Add(Me.lblOrderID)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmLabOrderEntry"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Add New Lab Order"

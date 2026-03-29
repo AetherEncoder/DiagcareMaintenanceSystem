@@ -18,6 +18,7 @@ Partial Class frmMedicineEntry
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMedicineEntry))
         Me.lblMedicineID = New System.Windows.Forms.Label()
         Me.txtMedicineID = New System.Windows.Forms.TextBox()
         Me.lblMedicineName = New System.Windows.Forms.Label()
@@ -95,7 +96,7 @@ Partial Class frmMedicineEntry
         '
         'btnSave
         '
-        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnSave.ForeColor = System.Drawing.Color.White
         Me.btnSave.Location = New System.Drawing.Point(300, 244)
         Me.btnSave.Name = "btnSave"
@@ -128,6 +129,7 @@ Partial Class frmMedicineEntry
         Me.Controls.Add(Me.lblMedicineName)
         Me.Controls.Add(Me.txtMedicineID)
         Me.Controls.Add(Me.lblMedicineID)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmMedicineEntry"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Add New Medicine"

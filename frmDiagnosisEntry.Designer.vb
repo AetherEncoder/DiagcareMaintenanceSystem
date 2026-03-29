@@ -17,6 +17,7 @@ Partial Class frmDiagnosisEntry
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmDiagnosisEntry))
         Me.lblDiagnosisID = New System.Windows.Forms.Label()
         Me.txtDiagnosisID = New System.Windows.Forms.TextBox()
         Me.lblPatient = New System.Windows.Forms.Label()
@@ -62,7 +63,6 @@ Partial Class frmDiagnosisEntry
         '
         Me.cboPatient.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cboPatient.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.cboPatient.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cboPatient.FormattingEnabled = True
         Me.cboPatient.Location = New System.Drawing.Point(160, 58)
         Me.cboPatient.Name = "cboPatient"
@@ -81,7 +81,6 @@ Partial Class frmDiagnosisEntry
         '
         Me.cboPhysician.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cboPhysician.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.cboPhysician.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cboPhysician.FormattingEnabled = True
         Me.cboPhysician.Location = New System.Drawing.Point(160, 96)
         Me.cboPhysician.Name = "cboPhysician"
@@ -137,7 +136,7 @@ Partial Class frmDiagnosisEntry
         '
         'btnSave
         '
-        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnSave.ForeColor = System.Drawing.Color.White
         Me.btnSave.Location = New System.Drawing.Point(300, 316)
         Me.btnSave.Name = "btnSave"
@@ -174,6 +173,7 @@ Partial Class frmDiagnosisEntry
         Me.Controls.Add(Me.lblPatient)
         Me.Controls.Add(Me.txtDiagnosisID)
         Me.Controls.Add(Me.lblDiagnosisID)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmDiagnosisEntry"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Add New Diagnosis"

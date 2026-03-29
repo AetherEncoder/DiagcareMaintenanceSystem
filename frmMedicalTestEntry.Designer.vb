@@ -18,6 +18,7 @@ Partial Class frmMedicalTestEntry
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmMedicalTestEntry))
         Me.lblTestID = New System.Windows.Forms.Label()
         Me.txtTestID = New System.Windows.Forms.TextBox()
         Me.lblTestName = New System.Windows.Forms.Label()
@@ -95,7 +96,7 @@ Partial Class frmMedicalTestEntry
         '
         'btnSave
         '
-        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnSave.ForeColor = System.Drawing.Color.White
         Me.btnSave.Location = New System.Drawing.Point(300, 244)
         Me.btnSave.Name = "btnSave"
@@ -113,7 +114,7 @@ Partial Class frmMedicalTestEntry
         Me.btnCancel.Text = "Cancel"
         Me.btnCancel.UseVisualStyleBackColor = True
         '
-        'frmMedicalTest
+        'frmMedicalTestEntry
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -128,7 +129,8 @@ Partial Class frmMedicalTestEntry
         Me.Controls.Add(Me.lblTestName)
         Me.Controls.Add(Me.txtTestID)
         Me.Controls.Add(Me.lblTestID)
-        Me.Name = "frmMedicalTest"
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Name = "frmMedicalTestEntry"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Add New Medical Test"
         Me.ResumeLayout(False)

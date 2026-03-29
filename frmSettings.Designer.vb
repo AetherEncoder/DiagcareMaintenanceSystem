@@ -22,6 +22,7 @@ Partial Class frmSettings
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmSettings))
         Me.grpUsername = New System.Windows.Forms.GroupBox()
         Me.btnSaveUsername = New System.Windows.Forms.Button()
         Me.txtUsername = New System.Windows.Forms.TextBox()
@@ -80,7 +81,7 @@ Partial Class frmSettings
         Me.lblUsername.ForeColor = System.Drawing.Color.Black
         Me.lblUsername.Location = New System.Drawing.Point(16, 31)
         Me.lblUsername.Name = "lblUsername"
-        Me.lblUsername.Size = New System.Drawing.Size(59, 15)
+        Me.lblUsername.Size = New System.Drawing.Size(64, 15)
         Me.lblUsername.TabIndex = 0
         Me.lblUsername.Text = "Username"
         '
@@ -127,7 +128,7 @@ Partial Class frmSettings
         Me.lblRetypePassword.ForeColor = System.Drawing.Color.Black
         Me.lblRetypePassword.Location = New System.Drawing.Point(16, 69)
         Me.lblRetypePassword.Name = "lblRetypePassword"
-        Me.lblRetypePassword.Size = New System.Drawing.Size(95, 15)
+        Me.lblRetypePassword.Size = New System.Drawing.Size(102, 15)
         Me.lblRetypePassword.TabIndex = 2
         Me.lblRetypePassword.Text = "Retype Password"
         '
@@ -145,7 +146,7 @@ Partial Class frmSettings
         Me.lblNewPassword.ForeColor = System.Drawing.Color.Black
         Me.lblNewPassword.Location = New System.Drawing.Point(16, 31)
         Me.lblNewPassword.Name = "lblNewPassword"
-        Me.lblNewPassword.Size = New System.Drawing.Size(84, 15)
+        Me.lblNewPassword.Size = New System.Drawing.Size(88, 15)
         Me.lblNewPassword.TabIndex = 0
         Me.lblNewPassword.Text = "New Password"
         '
@@ -194,6 +195,7 @@ Partial Class frmSettings
         Me.Controls.Add(Me.grpPassword)
         Me.Controls.Add(Me.grpUsername)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
         Me.MinimizeBox = False
         Me.Name = "frmSettings"

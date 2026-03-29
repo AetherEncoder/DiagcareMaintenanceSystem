@@ -22,6 +22,7 @@ Partial Class frmPrescriptionEntry
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmPrescriptionEntry))
         Me.lblPrescriptionID = New System.Windows.Forms.Label()
         Me.txtPrescriptionID = New System.Windows.Forms.TextBox()
         Me.lblPhysician = New System.Windows.Forms.Label()
@@ -71,7 +72,6 @@ Partial Class frmPrescriptionEntry
         '
         Me.cboPhysician.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cboPhysician.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.cboPhysician.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cboPhysician.FormattingEnabled = True
         Me.cboPhysician.Location = New System.Drawing.Point(160, 58)
         Me.cboPhysician.Name = "cboPhysician"
@@ -90,7 +90,6 @@ Partial Class frmPrescriptionEntry
         '
         Me.cboPatient.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cboPatient.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.cboPatient.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cboPatient.FormattingEnabled = True
         Me.cboPatient.Location = New System.Drawing.Point(160, 96)
         Me.cboPatient.Name = "cboPatient"
@@ -141,7 +140,6 @@ Partial Class frmPrescriptionEntry
         '
         Me.cboMedicine.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cboMedicine.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.cboMedicine.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cboMedicine.FormattingEnabled = True
         Me.cboMedicine.Location = New System.Drawing.Point(160, 274)
         Me.cboMedicine.Name = "cboMedicine"
@@ -184,7 +182,7 @@ Partial Class frmPrescriptionEntry
         '
         'btnSave
         '
-        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnSave.ForeColor = System.Drawing.Color.White
         Me.btnSave.Location = New System.Drawing.Point(300, 418)
         Me.btnSave.Name = "btnSave"
@@ -225,6 +223,7 @@ Partial Class frmPrescriptionEntry
         Me.Controls.Add(Me.lblPhysician)
         Me.Controls.Add(Me.txtPrescriptionID)
         Me.Controls.Add(Me.lblPrescriptionID)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmPrescriptionEntry"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Add New Prescription"

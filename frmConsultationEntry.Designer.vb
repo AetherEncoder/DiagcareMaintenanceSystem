@@ -22,6 +22,7 @@ Partial Class frmConsultationEntry
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmConsultationEntry))
         Me.lblConsultationID = New System.Windows.Forms.Label()
         Me.txtConsultationID = New System.Windows.Forms.TextBox()
         Me.lblPatient = New System.Windows.Forms.Label()
@@ -67,7 +68,6 @@ Partial Class frmConsultationEntry
         '
         Me.cboPatient.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cboPatient.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.cboPatient.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cboPatient.FormattingEnabled = True
         Me.cboPatient.Location = New System.Drawing.Point(160, 58)
         Me.cboPatient.Name = "cboPatient"
@@ -86,7 +86,6 @@ Partial Class frmConsultationEntry
         '
         Me.cboPhysician.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
         Me.cboPhysician.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
-        Me.cboPhysician.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown
         Me.cboPhysician.FormattingEnabled = True
         Me.cboPhysician.Location = New System.Drawing.Point(160, 96)
         Me.cboPhysician.Name = "cboPhysician"
@@ -143,7 +142,7 @@ Partial Class frmConsultationEntry
         '
         'btnSave
         '
-        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnSave.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnSave.ForeColor = System.Drawing.Color.White
         Me.btnSave.Location = New System.Drawing.Point(300, 348)
         Me.btnSave.Name = "btnSave"
@@ -180,6 +179,7 @@ Partial Class frmConsultationEntry
         Me.Controls.Add(Me.lblPatient)
         Me.Controls.Add(Me.txtConsultationID)
         Me.Controls.Add(Me.lblConsultationID)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmConsultationEntry"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Add New Consultation"

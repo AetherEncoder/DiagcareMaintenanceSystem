@@ -164,11 +164,41 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="frmConsultationEntry.resx">
+      <DependentUpon>frmConsultationEntry.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmDashboard.resx">
       <DependentUpon>frmDashboard.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmDiagnosisEntry.resx">
+      <DependentUpon>frmDiagnosisEntry.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmExaminationEntry.resx">
+      <DependentUpon>frmExaminationEntry.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmLabOrderEntry.resx">
+      <DependentUpon>frmLabOrderEntry.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMedicalTestEntry.resx">
+      <DependentUpon>frmMedicalTestEntry.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMedicineEntry.resx">
+      <DependentUpon>frmMedicineEntry.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMedTechEntry.resx">
+      <DependentUpon>frmMedTechEntry.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmPatientEntry.resx">
       <DependentUpon>frmPatientEntry.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPhysicianEntry.resx">
+      <DependentUpon>frmPhysicianEntry.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPrescriptionEntry.resx">
+      <DependentUpon>frmPrescriptionEntry.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSettings.resx">
+      <DependentUpon>frmSettings.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
