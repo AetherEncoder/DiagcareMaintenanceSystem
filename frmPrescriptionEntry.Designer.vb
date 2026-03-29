@@ -148,21 +148,31 @@ Partial Class frmPrescriptionEntry
         '
         'btnAddMedicine
         '
+        Me.btnAddMedicine.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
+        Me.btnAddMedicine.FlatAppearance.BorderSize = 0
+        Me.btnAddMedicine.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAddMedicine.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnAddMedicine.ForeColor = System.Drawing.Color.White
         Me.btnAddMedicine.Location = New System.Drawing.Point(396, 272)
         Me.btnAddMedicine.Name = "btnAddMedicine"
         Me.btnAddMedicine.Size = New System.Drawing.Size(94, 24)
         Me.btnAddMedicine.TabIndex = 12
         Me.btnAddMedicine.Text = "Add Medicine"
-        Me.btnAddMedicine.UseVisualStyleBackColor = True
+        Me.btnAddMedicine.UseVisualStyleBackColor = False
         '
         'btnRemoveMedicine
         '
+        Me.btnRemoveMedicine.BackColor = System.Drawing.Color.FromArgb(CType(CType(239, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(188, Byte), Integer))
+        Me.btnRemoveMedicine.FlatAppearance.BorderSize = 0
+        Me.btnRemoveMedicine.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnRemoveMedicine.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnRemoveMedicine.ForeColor = System.Drawing.Color.White
         Me.btnRemoveMedicine.Location = New System.Drawing.Point(396, 305)
         Me.btnRemoveMedicine.Name = "btnRemoveMedicine"
         Me.btnRemoveMedicine.Size = New System.Drawing.Size(94, 24)
         Me.btnRemoveMedicine.TabIndex = 13
         Me.btnRemoveMedicine.Text = "Remove"
-        Me.btnRemoveMedicine.UseVisualStyleBackColor = True
+        Me.btnRemoveMedicine.UseVisualStyleBackColor = False
         '
         'lblSelectedMedicines
         '
@@ -184,6 +194,9 @@ Partial Class frmPrescriptionEntry
         '
         Me.btnSave.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnSave.ForeColor = System.Drawing.Color.White
+        Me.btnSave.FlatAppearance.BorderSize = 0
+        Me.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnSave.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnSave.Location = New System.Drawing.Point(300, 418)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(90, 34)
@@ -193,17 +206,24 @@ Partial Class frmPrescriptionEntry
         '
         'btnCancel
         '
+        Me.btnCancel.BackColor = System.Drawing.Color.FromArgb(CType(CType(220, Byte), Integer), CType(CType(220, Byte), Integer), CType(CType(225, Byte), Integer))
+        Me.btnCancel.FlatAppearance.BorderSize = 0
+        Me.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnCancel.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.btnCancel.ForeColor = System.Drawing.Color.FromArgb(CType(CType(35, Byte), Integer), CType(CType(35, Byte), Integer), CType(CType(35, Byte), Integer))
         Me.btnCancel.Location = New System.Drawing.Point(400, 418)
         Me.btnCancel.Name = "btnCancel"
         Me.btnCancel.Size = New System.Drawing.Size(90, 34)
         Me.btnCancel.TabIndex = 17
         Me.btnCancel.Text = "Cancel"
-        Me.btnCancel.UseVisualStyleBackColor = True
+        Me.btnCancel.UseVisualStyleBackColor = False
         '
         'frmPrescriptionEntry
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.BackColor = System.Drawing.Color.White
+        Me.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ClientSize = New System.Drawing.Size(520, 470)
         Me.Controls.Add(Me.lstSelectedMedicines)
         Me.Controls.Add(Me.lblSelectedMedicines)
@@ -251,3 +271,7 @@ Partial Class frmPrescriptionEntry
     Friend WithEvents btnSave As Button
     Friend WithEvents btnCancel As Button
 End Class
+
+
+
+
