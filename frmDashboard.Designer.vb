@@ -87,7 +87,7 @@ Partial Class frmDashboard
         '
         Me.lblHeader.AutoSize = True
         Me.lblHeader.Font = New System.Drawing.Font("Microsoft Sans Serif", 24.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.lblHeader.ForeColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.lblHeader.ForeColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.lblHeader.Location = New System.Drawing.Point(388, 50)
         Me.lblHeader.Name = "lblHeader"
         Me.lblHeader.Size = New System.Drawing.Size(571, 37)
@@ -134,7 +134,7 @@ Partial Class frmDashboard
         '
         'btnLogin
         '
-        Me.btnLogin.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnLogin.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnLogin.Font = New System.Drawing.Font("Microsoft Sans Serif", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnLogin.ForeColor = System.Drawing.Color.White
         Me.btnLogin.Location = New System.Drawing.Point(524, 420)
@@ -227,7 +227,7 @@ Partial Class frmDashboard
         Me.grpQuickActions.Controls.Add(Me.btnNewLabOrder)
         Me.grpQuickActions.Controls.Add(Me.btnNewPrescription)
         Me.grpQuickActions.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.grpQuickActions.ForeColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.grpQuickActions.ForeColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.grpQuickActions.Location = New System.Drawing.Point(12, 239)
         Me.grpQuickActions.Name = "grpQuickActions"
         Me.grpQuickActions.Size = New System.Drawing.Size(1324, 94)
@@ -237,7 +237,7 @@ Partial Class frmDashboard
         '
         'btnNewPatient
         '
-        Me.btnNewPatient.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnNewPatient.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnNewPatient.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnNewPatient.ForeColor = System.Drawing.Color.White
         Me.btnNewPatient.Location = New System.Drawing.Point(14, 36)
@@ -249,7 +249,7 @@ Partial Class frmDashboard
         '
         'btnNewDiagnosis
         '
-        Me.btnNewDiagnosis.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnNewDiagnosis.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnNewDiagnosis.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnNewDiagnosis.ForeColor = System.Drawing.Color.White
         Me.btnNewDiagnosis.Location = New System.Drawing.Point(274, 36)
@@ -261,7 +261,7 @@ Partial Class frmDashboard
         '
         'btnNewConsultation
         '
-        Me.btnNewConsultation.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnNewConsultation.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnNewConsultation.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnNewConsultation.ForeColor = System.Drawing.Color.White
         Me.btnNewConsultation.Location = New System.Drawing.Point(534, 36)
@@ -273,7 +273,7 @@ Partial Class frmDashboard
         '
         'btnNewLabOrder
         '
-        Me.btnNewLabOrder.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnNewLabOrder.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnNewLabOrder.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnNewLabOrder.ForeColor = System.Drawing.Color.White
         Me.btnNewLabOrder.Location = New System.Drawing.Point(794, 36)
@@ -285,7 +285,7 @@ Partial Class frmDashboard
         '
         'btnNewPrescription
         '
-        Me.btnNewPrescription.BackColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.btnNewPrescription.BackColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.btnNewPrescription.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.btnNewPrescription.ForeColor = System.Drawing.Color.White
         Me.btnNewPrescription.Location = New System.Drawing.Point(1054, 36)
@@ -318,6 +318,7 @@ Partial Class frmDashboard
         'pbTrustMedLogo
         '
         Me.pbTrustMedLogo.BackColor = System.Drawing.Color.Transparent
+        Me.pbTrustMedLogo.Image = CType(resources.GetObject("pbTrustMedLogo.Image"), System.Drawing.Image)
         Me.pbTrustMedLogo.Location = New System.Drawing.Point(142, 58)
         Me.pbTrustMedLogo.Name = "pbTrustMedLogo"
         Me.pbTrustMedLogo.Size = New System.Drawing.Size(140, 90)
@@ -328,7 +329,7 @@ Partial Class frmDashboard
         'lblBrandingTitle
         '
         Me.lblBrandingTitle.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Bold)
-        Me.lblBrandingTitle.ForeColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.lblBrandingTitle.ForeColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.lblBrandingTitle.Location = New System.Drawing.Point(3, 8)
         Me.lblBrandingTitle.Name = "lblBrandingTitle"
         Me.lblBrandingTitle.Size = New System.Drawing.Size(418, 44)
@@ -350,7 +351,7 @@ Partial Class frmDashboard
         'lblLabOrdersValue
         '
         Me.lblLabOrdersValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 28.0!, System.Drawing.FontStyle.Bold)
-        Me.lblLabOrdersValue.ForeColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.lblLabOrdersValue.ForeColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.lblLabOrdersValue.Location = New System.Drawing.Point(3, 62)
         Me.lblLabOrdersValue.Name = "lblLabOrdersValue"
         Me.lblLabOrdersValue.Size = New System.Drawing.Size(430, 72)
@@ -361,7 +362,7 @@ Partial Class frmDashboard
         'lblLabOrdersTitle
         '
         Me.lblLabOrdersTitle.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Bold)
-        Me.lblLabOrdersTitle.ForeColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.lblLabOrdersTitle.ForeColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.lblLabOrdersTitle.Location = New System.Drawing.Point(3, 14)
         Me.lblLabOrdersTitle.Name = "lblLabOrdersTitle"
         Me.lblLabOrdersTitle.Size = New System.Drawing.Size(430, 44)
@@ -383,7 +384,7 @@ Partial Class frmDashboard
         'lblTotalPatientsValue
         '
         Me.lblTotalPatientsValue.Font = New System.Drawing.Font("Microsoft Sans Serif", 28.0!, System.Drawing.FontStyle.Bold)
-        Me.lblTotalPatientsValue.ForeColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.lblTotalPatientsValue.ForeColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.lblTotalPatientsValue.Location = New System.Drawing.Point(3, 62)
         Me.lblTotalPatientsValue.Name = "lblTotalPatientsValue"
         Me.lblTotalPatientsValue.Size = New System.Drawing.Size(430, 72)
@@ -394,7 +395,7 @@ Partial Class frmDashboard
         'lblTotalPatientsTitle
         '
         Me.lblTotalPatientsTitle.Font = New System.Drawing.Font("Microsoft Sans Serif", 10.0!, System.Drawing.FontStyle.Bold)
-        Me.lblTotalPatientsTitle.ForeColor = System.Drawing.Color.FromArgb(184, 19, 66)
+        Me.lblTotalPatientsTitle.ForeColor = System.Drawing.Color.FromArgb(CType(CType(184, Byte), Integer), CType(CType(19, Byte), Integer), CType(CType(66, Byte), Integer))
         Me.lblTotalPatientsTitle.Location = New System.Drawing.Point(3, 14)
         Me.lblTotalPatientsTitle.Name = "lblTotalPatientsTitle"
         Me.lblTotalPatientsTitle.Size = New System.Drawing.Size(430, 44)

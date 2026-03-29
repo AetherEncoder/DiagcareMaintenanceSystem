@@ -45,6 +45,8 @@ Public Class frmDashboard
     Private dgvReports As DataGridView
     Private reportDefinitions As New Dictionary(Of String, ReportDefinition)
     Private reportOrder As New List(Of String)
+    Private pbLoginLogo As PictureBox
+    Private pnlLoginCard As Panel
 
     Private Class ReportDefinition
         Public Property Title As String
@@ -73,6 +75,9 @@ Public Class frmDashboard
         If pbTrustMedLogo.Image Is Nothing AndAlso Me.Icon IsNot Nothing Then
             pbTrustMedLogo.Image = Me.Icon.ToBitmap()
         End If
+
+        ApplyModernLoginAppearance()
+        AddHandler pnlLoginContainer.Resize, AddressOf PnlLoginContainer_Resize
 
         InitializePatientsSectionUi()
         InitializeReportsSectionUi()
@@ -190,6 +195,7 @@ Public Class frmDashboard
         txtUsername.Text = ""
         txtPassword.Text = ""
         ClearErrorMessages()
+        ApplyModernLoginAppearance()
 
         txtUsername.Focus()
     End Sub
@@ -567,7 +573,7 @@ Public Class frmDashboard
                      "LEFT JOIN (SELECT TestID, COUNT(*) AS ExamUsage FROM exam_inclusion GROUP BY TestID) exm ON exm.TestID = mt.TestID " &
                      "ORDER BY TotalUsage DESC, mt.TestName",
             .EmptyMessage = "No test usage records found.",
-            .RequiredTables = New String() {"medical_test", "lab_order_inclusion", "exam_inclusion"}
+            .RequiredTables = New String() {"medical_tests", "lab_order_inclusion", "exam_inclusion"}
         }
 
         reportDefinitions("most_prescribed_medicines") = New ReportDefinition With {
@@ -1336,276 +1342,134 @@ Public Class frmDashboard
     End Sub
 
     Private Sub ShowAccountSettingsDialog()
-    If String.IsNullOrWhiteSpace(currentLoggedInUsername) Then
-        MessageBox.Show("No active account session found.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        Return
-    End If
 
-    Dim settingsForm As New Form()
-    settingsForm.Text = "Account Settings"
-    settingsForm.StartPosition = FormStartPosition.CenterParent
-    settingsForm.FormBorderStyle = FormBorderStyle.FixedDialog
-    settingsForm.MaximizeBox = False
-    settingsForm.MinimizeBox = False
-    settingsForm.ClientSize = New Size(520, 406)
 
-    Dim grpUsername As New GroupBox()
-    grpUsername.Text = "Update Username"
-    grpUsername.Font = New Font("Microsoft Sans Serif", 9.0!, FontStyle.Bold)
-    grpUsername.ForeColor = Color.FromArgb(184, 19, 66)
-    grpUsername.Location = New Point(16, 14)
-    grpUsername.Size = New Size(488, 104)
+    End Sub
 
-    Dim lblUsername As New Label()
-    lblUsername.Text = "Username"
-    lblUsername.ForeColor = Color.Black
-    lblUsername.Location = New Point(16, 31)
-    lblUsername.AutoSize = True
+    Private Sub ApplyModernLoginAppearance()
+        Dim accentColor As Color = Color.FromArgb(184, 19, 66)
 
-    Dim txtUsernameSetting As New TextBox()
-    txtUsernameSetting.Location = New Point(120, 28)
-    txtUsernameSetting.Size = New Size(352, 21)
-    txtUsernameSetting.Text = currentLoggedInUsername
+        Me.BackColor = Color.White
+        pnlLoginContainer.BackColor = Color.FromArgb(246, 246, 248)
 
-    Dim btnSaveUsername As New Button()
-    btnSaveUsername.Text = "Save Username"
-    btnSaveUsername.BackColor = Color.FromArgb(217, 92, 128)
-    btnSaveUsername.ForeColor = Color.White
-    btnSaveUsername.Location = New Point(336, 56)
-    btnSaveUsername.Size = New Size(136, 30)
-
-    AddHandler btnSaveUsername.Click,
-        Sub()
-            If UpdateCurrentUserUsername(txtUsernameSetting.Text.Trim()) Then
-                txtUsernameSetting.Text = currentLoggedInUsername
-            End If
-        End Sub
-
-    grpUsername.Controls.Add(lblUsername)
-    grpUsername.Controls.Add(txtUsernameSetting)
-    grpUsername.Controls.Add(btnSaveUsername)
-
-    Dim grpPassword As New GroupBox()
-    grpPassword.Text = "Change Password"
-    grpPassword.Font = New Font("Microsoft Sans Serif", 9.0!, FontStyle.Bold)
-    grpPassword.ForeColor = Color.FromArgb(184, 19, 66)
-    grpPassword.Location = New Point(16, 126)
-    grpPassword.Size = New Size(488, 146)
-
-    Dim lblPassword As New Label()
-    lblPassword.Text = "New Password"
-    lblPassword.ForeColor = Color.Black
-    lblPassword.Location = New Point(16, 31)
-    lblPassword.AutoSize = True
-
-    Dim txtPasswordSetting As New TextBox()
-    txtPasswordSetting.Location = New Point(120, 28)
-    txtPasswordSetting.Size = New Size(352, 21)
-    txtPasswordSetting.UseSystemPasswordChar = True
-
-    Dim lblRetypePassword As New Label()
-    lblRetypePassword.Text = "Retype"
-    lblRetypePassword.ForeColor = Color.Black
-    lblRetypePassword.Location = New Point(16, 69)
-    lblRetypePassword.AutoSize = True
-
-    Dim txtRetypePasswordSetting As New TextBox()
-    txtRetypePasswordSetting.Location = New Point(120, 66)
-    txtRetypePasswordSetting.Size = New Size(352, 21)
-    txtRetypePasswordSetting.UseSystemPasswordChar = True
-
-    Dim btnSavePassword As New Button()
-    btnSavePassword.Text = "Save Password"
-    btnSavePassword.BackColor = Color.FromArgb(217, 92, 128)
-    btnSavePassword.ForeColor = Color.White
-    btnSavePassword.Location = New Point(336, 106)
-    btnSavePassword.Size = New Size(136, 30)
-
-    AddHandler btnSavePassword.Click,
-        Sub()
-            If UpdateCurrentUserPassword(txtPasswordSetting.Text, txtRetypePasswordSetting.Text) Then
-                txtPasswordSetting.Text = ""
-                txtRetypePasswordSetting.Text = ""
-            End If
-        End Sub
-
-    grpPassword.Controls.Add(lblPassword)
-    grpPassword.Controls.Add(txtPasswordSetting)
-    grpPassword.Controls.Add(lblRetypePassword)
-    grpPassword.Controls.Add(txtRetypePasswordSetting)
-    grpPassword.Controls.Add(btnSavePassword)
-
-    Dim grpDanger As New GroupBox()
-    grpDanger.Text = "Delete Account"
-    grpDanger.Font = New Font("Microsoft Sans Serif", 9.0!, FontStyle.Bold)
-    grpDanger.ForeColor = Color.FromArgb(217, 92, 128)
-    grpDanger.Location = New Point(16, 280)
-    grpDanger.Size = New Size(488, 76)
-
-    Dim btnDeleteAccount As New Button()
-    btnDeleteAccount.Text = "Delete Account"
-    btnDeleteAccount.BackColor = Color.FromArgb(239, 168, 188)
-    btnDeleteAccount.ForeColor = Color.White
-    btnDeleteAccount.Location = New Point(336, 28)
-    btnDeleteAccount.Size = New Size(136, 30)
-
-    AddHandler btnDeleteAccount.Click,
-        Sub()
-            If DeleteCurrentUserAccount() Then
-                settingsForm.Tag = "DELETED"
-                settingsForm.DialogResult = DialogResult.OK
-                settingsForm.Close()
-            End If
-        End Sub
-
-    grpDanger.Controls.Add(btnDeleteAccount)
-
-    Dim btnCloseSettings As New Button()
-    btnCloseSettings.Text = "Close"
-    btnCloseSettings.Location = New Point(400, 364)
-    btnCloseSettings.Size = New Size(104, 30)
-    AddHandler btnCloseSettings.Click,
-        Sub()
-            settingsForm.DialogResult = DialogResult.Cancel
-            settingsForm.Close()
-        End Sub
-
-    settingsForm.Controls.Add(grpUsername)
-    settingsForm.Controls.Add(grpPassword)
-    settingsForm.Controls.Add(grpDanger)
-    settingsForm.Controls.Add(btnCloseSettings)
-
-    settingsForm.ShowDialog(Me)
-
-    If settingsForm.Tag IsNot Nothing AndAlso settingsForm.Tag.ToString() = "DELETED" Then
-        MessageBox.Show("Account deleted successfully.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        ShowLoginPage()
-    End If
-End Sub
-
-Private Function UpdateCurrentUserUsername(newUsername As String) As Boolean
-    If String.IsNullOrWhiteSpace(newUsername) Then
-        MessageBox.Show("Username is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        Return False
-    End If
-
-    If String.Equals(newUsername, currentLoggedInUsername, StringComparison.OrdinalIgnoreCase) Then
-        MessageBox.Show("No username changes detected.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        Return False
-    End If
-
-    Try
-        Using conn As New MySqlConnection(MyConnectionString)
-            conn.Open()
-
-            Using checkCmd As New MySqlCommand("SELECT COUNT(*) FROM USER WHERE username = @username", conn)
-                checkCmd.Parameters.AddWithValue("@username", newUsername)
-                If Convert.ToInt32(checkCmd.ExecuteScalar()) > 0 Then
-                    MessageBox.Show("Username is already taken.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                    Return False
-                End If
-            End Using
-
-            Using updateCmd As New MySqlCommand("UPDATE USER SET username = @newUsername WHERE username = @currentUsername", conn)
-                updateCmd.Parameters.AddWithValue("@newUsername", newUsername)
-                updateCmd.Parameters.AddWithValue("@currentUsername", currentLoggedInUsername)
-
-                If updateCmd.ExecuteNonQuery() = 0 Then
-                    MessageBox.Show("Account was not found.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                    Return False
-                End If
-            End Using
-        End Using
-
-        currentLoggedInUsername = newUsername
-        MessageBox.Show("Username updated successfully.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        Return True
-    Catch ex As Exception
-        MessageBox.Show("Unable to update username: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        Return False
-    End Try
-End Function
-
-Private Function UpdateCurrentUserPassword(password As String, retypePassword As String) As Boolean
-    If String.IsNullOrWhiteSpace(password) Then
-        MessageBox.Show("Password is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        Return False
-    End If
-
-    If String.IsNullOrWhiteSpace(retypePassword) Then
-        MessageBox.Show("Retype password is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        Return False
-    End If
-
-    If password <> retypePassword Then
-        MessageBox.Show("Passwords do not match.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        Return False
-    End If
-
-    Try
-        Using conn As New MySqlConnection(MyConnectionString)
-            conn.Open()
-
-            Using cmd As New MySqlCommand("UPDATE USER SET password = @password WHERE username = @username", conn)
-                cmd.Parameters.AddWithValue("@password", password)
-                cmd.Parameters.AddWithValue("@username", currentLoggedInUsername)
-
-                If cmd.ExecuteNonQuery() = 0 Then
-                    MessageBox.Show("Account was not found.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                    Return False
-                End If
-            End Using
-        End Using
-
-        MessageBox.Show("Password updated successfully.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        Return True
-    Catch ex As Exception
-        MessageBox.Show("Unable to update password: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        Return False
-    End Try
-End Function
-
-Private Function DeleteCurrentUserAccount() As Boolean
-    Dim confirm As DialogResult = MessageBox.Show("This will permanently delete your account. Continue?", "Delete Account", MessageBoxButtons.YesNo, MessageBoxIcon.Warning)
-    If confirm <> DialogResult.Yes Then
-        Return False
-    End If
-
-    Try
-        Using conn As New MySqlConnection(MyConnectionString)
-            conn.Open()
-
-            Using cmd As New MySqlCommand("DELETE FROM USER WHERE username = @username", conn)
-                cmd.Parameters.AddWithValue("@username", currentLoggedInUsername)
-                If cmd.ExecuteNonQuery() = 0 Then
-                    MessageBox.Show("Account was not found.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                    Return False
-                End If
-            End Using
-        End Using
-
-        Return True
-    Catch ex As Exception
-        MessageBox.Show("Unable to delete account: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        Return False
-    End Try
-End Function
-
-Private Sub ApplyGridWrapping(parent As Control)
-    For Each ctrl As Control In parent.Controls
-        If TypeOf ctrl Is DataGridView Then
-            Dim grid As DataGridView = CType(ctrl, DataGridView)
-            grid.DefaultCellStyle.WrapMode = DataGridViewTriState.True
-            grid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
+        If pnlLoginCard Is Nothing Then
+            pnlLoginCard = New Panel()
+            pnlLoginCard.Name = "pnlLoginCard"
+            pnlLoginCard.Size = New Size(520, 540)
+            pnlLoginCard.BackColor = Color.White
+            pnlLoginCard.BorderStyle = BorderStyle.FixedSingle
+            pnlLoginContainer.Controls.Add(pnlLoginCard)
+            pnlLoginCard.BringToFront()
         End If
 
-        If ctrl.HasChildren Then
-            ApplyGridWrapping(ctrl)
+        If pbLoginLogo Is Nothing Then
+            pbLoginLogo = New PictureBox()
+            pbLoginLogo.Name = "pbLoginLogo"
+            pbLoginLogo.Size = New Size(140, 90)
+            pbLoginLogo.SizeMode = PictureBoxSizeMode.Zoom
+            pbLoginLogo.BackColor = Color.Transparent
+            pnlLoginCard.Controls.Add(pbLoginLogo)
         End If
-    Next
-End Sub
 
-Private Sub lblLabOrdersValue_Click(sender As Object, e As EventArgs) Handles lblLabOrdersValue.Click
+        If pbTrustMedLogo.Image IsNot Nothing Then
+            pbLoginLogo.Image = pbTrustMedLogo.Image
+        End If
 
-End Sub
+        pnlLoginCard.Controls.Add(lblHeader)
+        pnlLoginCard.Controls.Add(lblUsername)
+        pnlLoginCard.Controls.Add(txtUsername)
+        pnlLoginCard.Controls.Add(lblUsernameError)
+        pnlLoginCard.Controls.Add(lblPassword)
+        pnlLoginCard.Controls.Add(txtPassword)
+        pnlLoginCard.Controls.Add(lblPasswordError)
+        pnlLoginCard.Controls.Add(lblLoginError)
+        pnlLoginCard.Controls.Add(btnLogin)
+        pnlLoginCard.Controls.Add(btnClose)
+
+        lblHeader.Font = New Font("Segoe UI", 20.0!, FontStyle.Bold)
+        lblHeader.ForeColor = accentColor
+        lblHeader.AutoSize = False
+        lblHeader.Width = 460
+        lblHeader.TextAlign = ContentAlignment.MiddleCenter
+
+        lblUsername.Font = New Font("Segoe UI", 10.5!, FontStyle.Regular)
+        lblPassword.Font = New Font("Segoe UI", 10.5!, FontStyle.Regular)
+        lblUsername.ForeColor = Color.FromArgb(60, 60, 60)
+        lblPassword.ForeColor = Color.FromArgb(60, 60, 60)
+
+        txtUsername.Font = New Font("Segoe UI", 11.0!, FontStyle.Regular)
+        txtPassword.Font = New Font("Segoe UI", 11.0!, FontStyle.Regular)
+        txtUsername.BorderStyle = BorderStyle.FixedSingle
+        txtPassword.BorderStyle = BorderStyle.FixedSingle
+
+        btnLogin.FlatStyle = FlatStyle.Flat
+        btnLogin.FlatAppearance.BorderSize = 0
+        btnLogin.BackColor = accentColor
+        btnLogin.ForeColor = Color.White
+        btnLogin.Font = New Font("Segoe UI", 10.0!, FontStyle.Bold)
+
+        btnClose.FlatStyle = FlatStyle.Flat
+        btnClose.FlatAppearance.BorderSize = 0
+        btnClose.BackColor = Color.FromArgb(220, 220, 225)
+        btnClose.ForeColor = Color.FromArgb(35, 35, 35)
+        btnClose.Font = New Font("Segoe UI", 10.0!, FontStyle.Bold)
+
+        PositionLoginControls()
+    End Sub
+
+    Private Sub PositionLoginControls()
+        If pnlLoginContainer Is Nothing OrElse pnlLoginCard Is Nothing Then Return
+
+        Dim cardLeft As Integer = (pnlLoginContainer.Width - pnlLoginCard.Width) \ 2
+        Dim cardTop As Integer = (pnlLoginContainer.Height - pnlLoginCard.Height) \ 2
+        pnlLoginCard.Location = New Point(Math.Max(12, cardLeft), Math.Max(12, cardTop))
+
+        Dim centerX As Integer = pnlLoginCard.Width \ 2
+
+        If pbLoginLogo IsNot Nothing Then
+            pbLoginLogo.Location = New Point(centerX - (pbLoginLogo.Width \ 2), 26)
+            pbLoginLogo.BringToFront()
+        End If
+
+        lblHeader.Location = New Point(centerX - (lblHeader.Width \ 2), 124)
+
+        lblUsername.Location = New Point(60, 210)
+        txtUsername.Location = New Point(60, 236)
+        txtUsername.Width = 400
+
+        lblUsernameError.Location = New Point(60, 264)
+
+        lblPassword.Location = New Point(60, 292)
+        txtPassword.Location = New Point(60, 318)
+        txtPassword.Width = 400
+
+        lblPasswordError.Location = New Point(60, 346)
+        lblLoginError.Location = New Point(60, 370)
+
+        btnLogin.Location = New Point(170, 420)
+        btnClose.Location = New Point(280, 420)
+    End Sub
+
+    Private Sub PnlLoginContainer_Resize(sender As Object, e As EventArgs)
+        PositionLoginControls()
+    End Sub
+
+    Private Sub ApplyGridWrapping(parent As Control)
+        For Each ctrl As Control In parent.Controls
+            If TypeOf ctrl Is DataGridView Then
+                Dim grid As DataGridView = CType(ctrl, DataGridView)
+                grid.DefaultCellStyle.WrapMode = DataGridViewTriState.True
+                grid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
+            End If
+
+            If ctrl.HasChildren Then
+                ApplyGridWrapping(ctrl)
+            End If
+        Next
+    End Sub
+
+    Private Sub lblLabOrdersValue_Click(sender As Object, e As EventArgs) Handles lblLabOrdersValue.Click
+
+    End Sub
 End Class
+
