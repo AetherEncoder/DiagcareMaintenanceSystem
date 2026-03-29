@@ -38,6 +38,8 @@ Public Class frmPatientEntry
             btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextPatientId()
         End If
+
+        UiTheme.ApplyModernFormStyle(Me)
     End Sub
 
     Private Sub txtPhoneNumber_Leave(sender As Object, e As EventArgs) Handles txtPhoneNumber.Leave
@@ -319,7 +321,7 @@ Public Class frmPatientEntry
                     If usedId = candidate Then
                         candidate += 1
                         If candidate > maxId Then
-                          Return -1
+                            Return -1
                         End If
                     ElseIf usedId > candidate Then
                         Exit While

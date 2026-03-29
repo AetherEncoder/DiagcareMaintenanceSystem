@@ -35,6 +35,8 @@ Public Class frmDiagnosisEntry
             btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextDiagnosisId()
         End If
+
+        UiTheme.ApplyModernFormStyle(Me)
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
@@ -262,7 +264,7 @@ Public Class frmDiagnosisEntry
                     If usedId = candidate Then
                         candidate += 1
                         If candidate > maxId Then
-                            Return -1
+                          Return -1
                         End If
                     ElseIf usedId > candidate Then
                         Exit While

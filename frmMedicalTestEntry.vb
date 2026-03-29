@@ -33,6 +33,8 @@ Public Class frmMedicalTestEntry
             btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextTestId()
         End If
+
+        UiTheme.ApplyModernFormStyle(Me)
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
@@ -41,9 +43,7 @@ Public Class frmMedicalTestEntry
     End Sub
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
-        If Not ValidateInputs() Then
-            Return
-        End If
+        If Not ValidateInputs() Then Return
 
         Dim testId As Integer
         If Not Integer.TryParse(txtTestID.Text.Trim(), testId) Then
@@ -96,6 +96,44 @@ Public Class frmMedicalTestEntry
         End Try
     End Sub
 
+    Private Sub LoadMedicalTestForUpdate()
+        If String.IsNullOrWhiteSpace(_connectionString) OrElse _existingTestId <= 0 Then
+            MessageBox.Show("Unable to load selected medical test.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Me.DialogResult = DialogResult.Cancel
+            Me.Close()
+            Return
+        End If
+
+        Try
+            Using conn As New MySqlConnection(_connectionString)
+                conn.Open()
+
+                Dim sql As String = "SELECT TestID, TestName, TestDescription, Cost FROM medical_test WHERE TestID = @TestID"
+                Using cmd As New MySqlCommand(sql, conn)
+                    cmd.Parameters.AddWithValue("@TestID", _existingTestId)
+
+                    Using reader As MySqlDataReader = cmd.ExecuteReader()
+                        If Not reader.Read() Then
+                            MessageBox.Show("Selected medical test was not found.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            Me.DialogResult = DialogResult.Cancel
+                            Me.Close()
+                            Return
+                        End If
+
+                        txtTestID.Text = Convert.ToInt32(reader("TestID")).ToString()
+                        txtTestName.Text = reader("TestName").ToString()
+                        txtTestDescription.Text = reader("TestDescription").ToString()
+                        txtCost.Text = Convert.ToDecimal(reader("Cost")).ToString("0.##")
+                    End Using
+                End Using
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("Unable to load selected medical test: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Me.DialogResult = DialogResult.Cancel
+            Me.Close()
+        End Try
+    End Sub
+
     Private Function ValidateInputs() As Boolean
         If String.IsNullOrWhiteSpace(_connectionString) Then
             MessageBox.Show("Connection string is not set.", "Configuration", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -115,6 +153,13 @@ Public Class frmMedicalTestEntry
 
         If String.IsNullOrWhiteSpace(txtCost.Text) Then
             MessageBox.Show("Cost is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            txtCost.Focus()
+            Return False
+        End If
+
+        Dim costValue As Decimal
+        If Not Decimal.TryParse(txtCost.Text.Trim(), costValue) OrElse costValue < 0D Then
+            MessageBox.Show("Cost must be a valid non-negative number.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             txtCost.Focus()
             Return False
         End If
@@ -190,42 +235,4 @@ Public Class frmMedicalTestEntry
 
         Return candidate
     End Function
-
-    Private Sub LoadMedicalTestForUpdate()
-        If String.IsNullOrWhiteSpace(_connectionString) OrElse _existingTestId <= 0 Then
-            MessageBox.Show("Unable to load selected medical test.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Me.DialogResult = DialogResult.Cancel
-            Me.Close()
-            Return
-        End If
-
-        Try
-            Using conn As New MySqlConnection(_connectionString)
-                conn.Open()
-
-                Dim sql As String = "SELECT TestID, TestName, TestDescription, Cost FROM medical_test WHERE TestID = @TestID"
-                Using cmd As New MySqlCommand(sql, conn)
-                    cmd.Parameters.AddWithValue("@TestID", _existingTestId)
-
-                    Using reader As MySqlDataReader = cmd.ExecuteReader()
-                        If Not reader.Read() Then
-                            MessageBox.Show("Selected medical test was not found.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                            Me.DialogResult = DialogResult.Cancel
-                            Me.Close()
-                            Return
-                        End If
-
-                        txtTestID.Text = Convert.ToInt32(reader("TestID")).ToString()
-                        txtTestName.Text = reader("TestName").ToString()
-                        txtTestDescription.Text = reader("TestDescription").ToString()
-                        txtCost.Text = Convert.ToDecimal(reader("Cost")).ToString("0.##")
-                    End Using
-                End Using
-            End Using
-        Catch ex As Exception
-            MessageBox.Show("Unable to load selected medical test: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Me.DialogResult = DialogResult.Cancel
-            Me.Close()
-        End Try
-    End Sub
 End Class

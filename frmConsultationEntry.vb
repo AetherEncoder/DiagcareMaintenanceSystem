@@ -35,6 +35,8 @@ Public Class frmConsultationEntry
             btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextConsultationId()
         End If
+
+        UiTheme.ApplyModernFormStyle(Me)
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click

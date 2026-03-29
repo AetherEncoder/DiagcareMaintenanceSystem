@@ -59,6 +59,8 @@ Public Class frmExaminationEntry
             btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextExaminationId()
         End If
+
+        UiTheme.ApplyModernFormStyle(Me)
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click

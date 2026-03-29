@@ -1731,3 +1731,76 @@ Public Class frmDashboard
     End Sub
 End Class
 
+Public Module UiTheme
+    Private ReadOnly AccentColor As Color = Color.FromArgb(184, 19, 66)
+    Private ReadOnly UpdateColor As Color = Color.FromArgb(217, 92, 128)
+    Private ReadOnly DeleteColor As Color = Color.FromArgb(239, 168, 188)
+
+    Public Sub ApplyModernFormStyle(targetForm As Form)
+        If targetForm Is Nothing Then Return
+
+        targetForm.BackColor = Color.White
+        targetForm.Font = New Font("Segoe UI", 9.0!, FontStyle.Regular)
+        ApplyToControls(targetForm)
+    End Sub
+
+    Private Sub ApplyToControls(parent As Control)
+        For Each ctrl As Control In parent.Controls
+            If TypeOf ctrl Is GroupBox Then
+                Dim grp As GroupBox = CType(ctrl, GroupBox)
+                grp.ForeColor = AccentColor
+                grp.Font = New Font("Segoe UI", 9.0!, FontStyle.Bold)
+            ElseIf TypeOf ctrl Is Label Then
+                Dim lbl As Label = CType(ctrl, Label)
+                lbl.ForeColor = Color.FromArgb(55, 55, 55)
+                lbl.Font = New Font("Segoe UI", 9.0!, lbl.Font.Style)
+            ElseIf TypeOf ctrl Is TextBox Then
+                Dim tb As TextBox = CType(ctrl, TextBox)
+                tb.BorderStyle = BorderStyle.FixedSingle
+                tb.Font = New Font("Segoe UI", 10.0!, FontStyle.Regular)
+                tb.BackColor = Color.White
+            ElseIf TypeOf ctrl Is ComboBox Then
+                Dim cb As ComboBox = CType(ctrl, ComboBox)
+                cb.Font = New Font("Segoe UI", 10.0!, FontStyle.Regular)
+                cb.BackColor = Color.White
+            ElseIf TypeOf ctrl Is DateTimePicker Then
+                Dim dtp As DateTimePicker = CType(ctrl, DateTimePicker)
+                dtp.Font = New Font("Segoe UI", 10.0!, FontStyle.Regular)
+                dtp.CalendarMonthBackground = Color.White
+            ElseIf TypeOf ctrl Is ListBox Then
+                Dim lb As ListBox = CType(ctrl, ListBox)
+                lb.Font = New Font("Segoe UI", 9.5!, FontStyle.Regular)
+                lb.BackColor = Color.White
+            ElseIf TypeOf ctrl Is Button Then
+                StyleButton(CType(ctrl, Button))
+            End If
+
+            If ctrl.HasChildren Then
+                ApplyToControls(ctrl)
+            End If
+        Next
+    End Sub
+
+    Private Sub StyleButton(btn As Button)
+        Dim text As String = If(btn.Text, String.Empty).ToLowerInvariant()
+
+        btn.FlatStyle = FlatStyle.Flat
+        btn.FlatAppearance.BorderSize = 0
+        btn.Font = New Font("Segoe UI", 9.0!, FontStyle.Bold)
+
+        If text.Contains("delete") OrElse text.Contains("remove") Then
+            btn.BackColor = DeleteColor
+            btn.ForeColor = Color.White
+        ElseIf text.Contains("update") Then
+            btn.BackColor = UpdateColor
+            btn.ForeColor = Color.White
+        ElseIf text.Contains("cancel") OrElse text.Contains("close") Then
+            btn.BackColor = Color.FromArgb(220, 220, 225)
+            btn.ForeColor = Color.FromArgb(35, 35, 35)
+        Else
+            btn.BackColor = AccentColor
+            btn.ForeColor = Color.White
+        End If
+    End Sub
+End Module
+

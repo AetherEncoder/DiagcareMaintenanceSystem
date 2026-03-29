@@ -47,6 +47,8 @@ Partial Class frmPrescriptionEntry
             btnSave.BackColor = Color.FromArgb(184, 19, 66)
             LoadNextPrescriptionId()
         End If
+
+        UiTheme.ApplyModernFormStyle(Me)
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
@@ -418,3 +420,4 @@ Partial Class frmPrescriptionEntry
         Return candidate
     End Function
 End Class
+
