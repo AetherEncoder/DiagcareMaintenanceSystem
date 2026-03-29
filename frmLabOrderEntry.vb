@@ -3,6 +3,8 @@
 Partial Class frmLabOrderEntry
     Private ReadOnly _connectionString As String
     Private ReadOnly _selectedTests As New List(Of LabTestSelectionItem)()
+    Private ReadOnly _isUpdateMode As Boolean
+    Private ReadOnly _existingOrderId As Integer
 
     Private Class LabTestSelectionItem
         Public Property TestID As Integer
@@ -22,11 +24,27 @@ Partial Class frmLabOrderEntry
         InitializeComponent()
     End Sub
 
+    Public Sub New(connectionString As String, orderId As Integer)
+        _connectionString = connectionString
+        _isUpdateMode = True
+        _existingOrderId = orderId
+        InitializeComponent()
+    End Sub
+
     Private Sub frmLabOrderEntry_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        LoadNextOrderId()
         LoadPhysicianAndPatientOptions()
         LoadMedicalTestOptions()
         RefreshSelectedTestsList()
+
+        If _isUpdateMode Then
+            Me.Text = "Update Lab Order"
+            btnSave.Text = "Update"
+            LoadLabOrderForUpdate()
+        Else
+            Me.Text = "Add New Lab Order"
+            btnSave.Text = "Save"
+            LoadNextOrderId()
+        End If
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
@@ -77,6 +95,64 @@ Partial Class frmLabOrderEntry
         RefreshSelectedTestsList()
     End Sub
 
+    Private Sub LoadLabOrderForUpdate()
+        If String.IsNullOrWhiteSpace(_connectionString) OrElse _existingOrderId <= 0 Then
+            MessageBox.Show("Unable to load selected lab order.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Me.DialogResult = DialogResult.Cancel
+            Me.Close()
+            Return
+        End If
+
+        Try
+            Using conn As New MySqlConnection(_connectionString)
+                conn.Open()
+
+                Dim orderSql As String = "SELECT OrderID, PhysicianID, PatientID, OrderDate FROM lab_order WHERE OrderID = @OrderID"
+                Using orderCmd As New MySqlCommand(orderSql, conn)
+                    orderCmd.Parameters.AddWithValue("@OrderID", _existingOrderId)
+
+                    Using reader As MySqlDataReader = orderCmd.ExecuteReader()
+                        If Not reader.Read() Then
+                            MessageBox.Show("Selected lab order was not found.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            Me.DialogResult = DialogResult.Cancel
+                            Me.Close()
+                            Return
+                        End If
+
+                        txtOrderID.Text = Convert.ToInt32(reader("OrderID")).ToString()
+                        cboPhysician.SelectedValue = Convert.ToInt32(reader("PhysicianID"))
+                        cboPatient.SelectedValue = Convert.ToInt32(reader("PatientID"))
+
+                        If Not Convert.IsDBNull(reader("OrderDate")) Then
+                            dtpOrderDate.Value = Convert.ToDateTime(reader("OrderDate"))
+                        End If
+                    End Using
+                End Using
+
+                _selectedTests.Clear()
+                Dim testsSql As String = "SELECT mt.TestID, CONCAT(mt.TestName, ' (', mt.TestID, ')') AS FullName FROM lab_order_inclusion loi INNER JOIN medical_test mt ON mt.TestID = loi.TestID WHERE loi.OrderID = @OrderID ORDER BY mt.TestName"
+                Using testsCmd As New MySqlCommand(testsSql, conn)
+                    testsCmd.Parameters.AddWithValue("@OrderID", _existingOrderId)
+
+                    Using reader As MySqlDataReader = testsCmd.ExecuteReader()
+                        While reader.Read()
+                            _selectedTests.Add(New LabTestSelectionItem With {
+                                .TestID = Convert.ToInt32(reader("TestID")),
+                                .DisplayName = reader("FullName").ToString()
+                            })
+                        End While
+                    End Using
+                End Using
+
+                RefreshSelectedTestsList()
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("Unable to load selected lab order: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Me.DialogResult = DialogResult.Cancel
+            Me.Close()
+        End Try
+    End Sub
+
     Private Function IsTestSelected(testId As Integer) As Boolean
         For Each item As LabTestSelectionItem In _selectedTests
             If item.TestID = testId Then Return True
@@ -112,15 +188,33 @@ Partial Class frmLabOrderEntry
             Using conn As New MySqlConnection(_connectionString)
                 conn.Open()
 
-                Dim sql As String = "INSERT INTO lab_order (OrderID, PhysicianID, PatientID, OrderDate) VALUES (@OrderID, @PhysicianID, @PatientID, @OrderDate)"
+                If _isUpdateMode Then
+                    Dim sql As String = "UPDATE lab_order SET PhysicianID = @PhysicianID, PatientID = @PatientID, OrderDate = @OrderDate WHERE OrderID = @OrderID"
 
-                Using cmd As New MySqlCommand(sql, conn)
-                    cmd.Parameters.AddWithValue("@OrderID", orderId)
-                    cmd.Parameters.AddWithValue("@PhysicianID", physicianId)
-                    cmd.Parameters.AddWithValue("@PatientID", patientId)
-                    cmd.Parameters.AddWithValue("@OrderDate", dtpOrderDate.Value.Date)
-                    cmd.ExecuteNonQuery()
-                End Using
+                    Using cmd As New MySqlCommand(sql, conn)
+                        cmd.Parameters.AddWithValue("@OrderID", orderId)
+                        cmd.Parameters.AddWithValue("@PhysicianID", physicianId)
+                        cmd.Parameters.AddWithValue("@PatientID", patientId)
+                        cmd.Parameters.AddWithValue("@OrderDate", dtpOrderDate.Value.Date)
+                        cmd.ExecuteNonQuery()
+                    End Using
+
+                    Dim deleteSql As String = "DELETE FROM lab_order_inclusion WHERE OrderID = @OrderID"
+                    Using deleteCmd As New MySqlCommand(deleteSql, conn)
+                        deleteCmd.Parameters.AddWithValue("@OrderID", orderId)
+                        deleteCmd.ExecuteNonQuery()
+                    End Using
+                Else
+                    Dim sql As String = "INSERT INTO lab_order (OrderID, PhysicianID, PatientID, OrderDate) VALUES (@OrderID, @PhysicianID, @PatientID, @OrderDate)"
+
+                    Using cmd As New MySqlCommand(sql, conn)
+                        cmd.Parameters.AddWithValue("@OrderID", orderId)
+                        cmd.Parameters.AddWithValue("@PhysicianID", physicianId)
+                        cmd.Parameters.AddWithValue("@PatientID", patientId)
+                        cmd.Parameters.AddWithValue("@OrderDate", dtpOrderDate.Value.Date)
+                        cmd.ExecuteNonQuery()
+                    End Using
+                End If
 
                 Dim inclusionSql As String = "INSERT INTO lab_order_inclusion (TestID, OrderID) VALUES (@TestID, @OrderID)"
                 For Each testItem As LabTestSelectionItem In _selectedTests
@@ -132,7 +226,7 @@ Partial Class frmLabOrderEntry
                 Next
             End Using
 
-            MessageBox.Show("Lab order added successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Lab order " & If(_isUpdateMode, "updated", "added") & " successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Me.DialogResult = DialogResult.OK
             Me.Close()
         Catch ex As Exception

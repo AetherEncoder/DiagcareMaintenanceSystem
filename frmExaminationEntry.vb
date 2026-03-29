@@ -4,6 +4,8 @@ Public Class frmExaminationEntry
     Private ReadOnly _connectionString As String
     Private ReadOnly _selectedLabTests As New List(Of LabTestSelectionItem)()
     Private ReadOnly _selectedMedTechs As New List(Of MedTechSelectionItem)()
+    Private ReadOnly _isUpdateMode As Boolean
+    Private ReadOnly _existingExaminationId As Integer
 
     Private Class LabTestSelectionItem
         Public Property TestID As Integer
@@ -32,13 +34,29 @@ Public Class frmExaminationEntry
         InitializeComponent()
     End Sub
 
+    Public Sub New(connectionString As String, examinationId As Integer)
+        _connectionString = connectionString
+        _isUpdateMode = True
+        _existingExaminationId = examinationId
+        InitializeComponent()
+    End Sub
+
     Private Sub frmExaminationEntry_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        LoadNextExaminationId()
         LoadPatientOptions()
         LoadLabTestOptions()
         LoadMedTechOptions()
         RefreshSelectedLabTestsList()
         RefreshSelectedMedTechsList()
+
+        If _isUpdateMode Then
+            Me.Text = "Update Examination"
+            btnSave.Text = "Update"
+            LoadExaminationForUpdate()
+        Else
+            Me.Text = "Add New Examination"
+            btnSave.Text = "Save"
+            LoadNextExaminationId()
+        End If
     End Sub
 
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
@@ -168,6 +186,80 @@ Public Class frmExaminationEntry
         Next
     End Sub
 
+    Private Sub LoadExaminationForUpdate()
+        If String.IsNullOrWhiteSpace(_connectionString) OrElse _existingExaminationId <= 0 Then
+            MessageBox.Show("Unable to load selected examination.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Me.DialogResult = DialogResult.Cancel
+            Me.Close()
+            Return
+        End If
+
+        Try
+            Using conn As New MySqlConnection(_connectionString)
+                conn.Open()
+
+                Dim examSql As String = "SELECT ExaminationID, PatientID, Result, DatePerformed FROM examination WHERE ExaminationID = @ExaminationID"
+                Using examCmd As New MySqlCommand(examSql, conn)
+                    examCmd.Parameters.AddWithValue("@ExaminationID", _existingExaminationId)
+
+                    Using reader As MySqlDataReader = examCmd.ExecuteReader()
+                        If Not reader.Read() Then
+                            MessageBox.Show("Selected examination was not found.", "Update", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                            Me.DialogResult = DialogResult.Cancel
+                            Me.Close()
+                            Return
+                        End If
+
+                        txtExaminationID.Text = Convert.ToInt32(reader("ExaminationID")).ToString()
+                        txtResult.Text = reader("Result").ToString()
+                        cboPatient.SelectedValue = Convert.ToInt32(reader("PatientID"))
+
+                        If Not Convert.IsDBNull(reader("DatePerformed")) Then
+                            dtpDatePerformed.Value = Convert.ToDateTime(reader("DatePerformed"))
+                        End If
+                    End Using
+                End Using
+
+                _selectedLabTests.Clear()
+                Dim testsSql As String = "SELECT mt.TestID, CONCAT(mt.TestName, ' (', mt.TestID, ')') AS FullName FROM exam_inclusion ei INNER JOIN medical_test mt ON mt.TestID = ei.TestID WHERE ei.ExaminationID = @ExaminationID ORDER BY mt.TestName"
+                Using testsCmd As New MySqlCommand(testsSql, conn)
+                    testsCmd.Parameters.AddWithValue("@ExaminationID", _existingExaminationId)
+
+                    Using reader As MySqlDataReader = testsCmd.ExecuteReader()
+                        While reader.Read()
+                            _selectedLabTests.Add(New LabTestSelectionItem With {
+                                .TestID = Convert.ToInt32(reader("TestID")),
+                                .DisplayName = reader("FullName").ToString()
+                            })
+                        End While
+                    End Using
+                End Using
+
+                _selectedMedTechs.Clear()
+                Dim medTechSql As String = "SELECT md.MedtechID, CONCAT(md.FirstName, ' ', md.LastName, ' (', md.MedtechID, ')') AS FullName FROM performance pf INNER JOIN medtech md ON md.MedtechID = pf.MedtechID WHERE pf.ExaminationID = @ExaminationID ORDER BY md.FirstName, md.LastName"
+                Using medTechCmd As New MySqlCommand(medTechSql, conn)
+                    medTechCmd.Parameters.AddWithValue("@ExaminationID", _existingExaminationId)
+
+                    Using reader As MySqlDataReader = medTechCmd.ExecuteReader()
+                        While reader.Read()
+                            _selectedMedTechs.Add(New MedTechSelectionItem With {
+                                .MedTechID = Convert.ToInt32(reader("MedtechID")),
+                                .DisplayName = reader("FullName").ToString()
+                            })
+                        End While
+                    End Using
+                End Using
+
+                RefreshSelectedLabTestsList()
+                RefreshSelectedMedTechsList()
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("Unable to load selected examination: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Me.DialogResult = DialogResult.Cancel
+            Me.Close()
+        End Try
+    End Sub
+
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         If Not ValidateInputs() Then
             Return
@@ -185,14 +277,37 @@ Public Class frmExaminationEntry
             Using conn As New MySqlConnection(_connectionString)
                 conn.Open()
 
-                Dim examSql As String = "INSERT INTO examination (ExaminationID, PatientID, Result, DatePerformed) VALUES (@ExaminationID, @PatientID, @Result, @DatePerformed)"
-                Using examCmd As New MySqlCommand(examSql, conn)
-                    examCmd.Parameters.AddWithValue("@ExaminationID", examinationId)
-                    examCmd.Parameters.AddWithValue("@PatientID", patientId)
-                    examCmd.Parameters.AddWithValue("@Result", txtResult.Text.Trim())
-                    examCmd.Parameters.AddWithValue("@DatePerformed", dtpDatePerformed.Value.Date)
-                    examCmd.ExecuteNonQuery()
-                End Using
+                If _isUpdateMode Then
+                    Dim updateSql As String = "UPDATE examination SET PatientID = @PatientID, Result = @Result, DatePerformed = @DatePerformed WHERE ExaminationID = @ExaminationID"
+                    Using updateCmd As New MySqlCommand(updateSql, conn)
+                        updateCmd.Parameters.AddWithValue("@ExaminationID", _existingExaminationId)
+                        updateCmd.Parameters.AddWithValue("@PatientID", patientId)
+                        updateCmd.Parameters.AddWithValue("@Result", txtResult.Text.Trim())
+                        updateCmd.Parameters.AddWithValue("@DatePerformed", dtpDatePerformed.Value.Date)
+                        updateCmd.ExecuteNonQuery()
+                    End Using
+
+                    Dim deleteInclusionSql As String = "DELETE FROM exam_inclusion WHERE ExaminationID = @ExaminationID"
+                    Using deleteInclusionCmd As New MySqlCommand(deleteInclusionSql, conn)
+                        deleteInclusionCmd.Parameters.AddWithValue("@ExaminationID", _existingExaminationId)
+                        deleteInclusionCmd.ExecuteNonQuery()
+                    End Using
+
+                    Dim deletePerformanceSql As String = "DELETE FROM performance WHERE ExaminationID = @ExaminationID"
+                    Using deletePerformanceCmd As New MySqlCommand(deletePerformanceSql, conn)
+                        deletePerformanceCmd.Parameters.AddWithValue("@ExaminationID", _existingExaminationId)
+                        deletePerformanceCmd.ExecuteNonQuery()
+                    End Using
+                Else
+                    Dim examSql As String = "INSERT INTO examination (ExaminationID, PatientID, Result, DatePerformed) VALUES (@ExaminationID, @PatientID, @Result, @DatePerformed)"
+                    Using examCmd As New MySqlCommand(examSql, conn)
+                        examCmd.Parameters.AddWithValue("@ExaminationID", examinationId)
+                        examCmd.Parameters.AddWithValue("@PatientID", patientId)
+                        examCmd.Parameters.AddWithValue("@Result", txtResult.Text.Trim())
+                        examCmd.Parameters.AddWithValue("@DatePerformed", dtpDatePerformed.Value.Date)
+                        examCmd.ExecuteNonQuery()
+                    End Using
+                End If
 
                 Dim inclusionSql As String = "INSERT INTO exam_inclusion (TestID, ExaminationID) VALUES (@TestID, @ExaminationID)"
                 For Each labTest As LabTestSelectionItem In _selectedLabTests
@@ -213,7 +328,7 @@ Public Class frmExaminationEntry
                 Next
             End Using
 
-            MessageBox.Show("Examination added successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Examination " & If(_isUpdateMode, "updated", "added") & " successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Me.DialogResult = DialogResult.OK
             Me.Close()
         Catch ex As Exception

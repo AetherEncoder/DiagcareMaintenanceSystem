@@ -754,6 +754,10 @@ Public Class frmDashboard
                 idColumn = "ConsultationID"
             Case "diagnoses"
                 idColumn = "DiagnosisID"
+            Case "laborders"
+                idColumn = "OrderID"
+            Case "examinations"
+                idColumn = "ExaminationID"
             Case Else
                 ShowQuickActionPlaceholder("Update " & currentSectionSingular)
                 Return
@@ -822,6 +826,34 @@ Public Class frmDashboard
                             Dim sectionQuery As String = ""
                             GetSectionConfig("diagnoses", sectionTitle, sectionSingular, sectionQuery)
                             LoadSectionData("diagnoses", sectionQuery)
+                        End If
+                    End If
+                End Using
+            Case "laborders"
+                Using labOrderEntry As New frmLabOrderEntry(MyConnectionString, selectedId)
+                    If labOrderEntry.ShowDialog(Me) = DialogResult.OK Then
+                        LoadDashboardOverview()
+
+                        If pnlPatientsSection IsNot Nothing AndAlso pnlPatientsSection.Visible Then
+                            Dim sectionTitle As String = ""
+                            Dim sectionSingular As String = ""
+                            Dim sectionQuery As String = ""
+                            GetSectionConfig("laborders", sectionTitle, sectionSingular, sectionQuery)
+                            LoadSectionData("laborders", sectionQuery)
+                        End If
+                    End If
+                End Using
+            Case "examinations"
+                Using examinationEntry As New frmExaminationEntry(MyConnectionString, selectedId)
+                    If examinationEntry.ShowDialog(Me) = DialogResult.OK Then
+                        LoadDashboardOverview()
+
+                        If pnlPatientsSection IsNot Nothing AndAlso pnlPatientsSection.Visible Then
+                            Dim sectionTitle As String = ""
+                            Dim sectionSingular As String = ""
+                            Dim sectionQuery As String = ""
+                            GetSectionConfig("examinations", sectionTitle, sectionSingular, sectionQuery)
+                            LoadSectionData("examinations", sectionQuery)
                         End If
                     End If
                 End Using
